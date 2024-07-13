@@ -14,15 +14,21 @@ ext {
     junitVersion = '5.10.0'
 }
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = '21'
+targetCompatibility = '21'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2'
+
     compileOnly('jakarta.servlet:jakarta.servlet-api:6.0.0')
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
