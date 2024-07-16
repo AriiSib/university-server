@@ -1,5 +1,7 @@
 package com.khokhlov.universityserver.servlet;
 
+import com.khokhlov.universityserver.exception.StudentAlreadyExistsException;
+import com.khokhlov.universityserver.exception.StudentNotFoundException;
 import com.khokhlov.universityserver.model.dto.StudentDTO;
 import com.khokhlov.universityserver.service.JsonService;
 import com.khokhlov.universityserver.service.StudentService;
@@ -10,7 +12,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 
 import java.io.*;
 
@@ -18,7 +19,6 @@ import static com.khokhlov.universityserver.consts.Consts.*;
 
 
 @WebServlet(name = "studentService", value = "/students/*")
-@RequiredArgsConstructor
 public class StudentServlet extends HttpServlet {
 
     private StudentService studentService;
@@ -35,12 +35,7 @@ public class StudentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        Object result = getPathInfo(req, resp);
-
-        System.out.println(req.getPathInfo());
-        System.out.println(req.getAttribute("name"));
-        System.out.println(req.getParameter("name"));
-        System.out.println(req.getRequestURI());
+        Object result = getPathInfo(req);
 
         resp.setContentType("application/json");
         PrintWriter out = resp.getWriter();
@@ -48,8 +43,56 @@ public class StudentServlet extends HttpServlet {
         out.flush();
     }
 
-    private Object getPathInfo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String pathInfo = req.getPathInfo(); // /{id} или /name/{name} или /surname/{surname}
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            var studentToSaveAsString = getBody(req);
+            var studentDTO = jsonService.fromJson(studentToSaveAsString, StudentDTO.class);
+            studentService.addStudent(studentDTO);
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+        } catch (StudentAlreadyExistsException e) {
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+            resp.getWriter().write(e.getMessage());
+        }
+    }
+
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            String pathInfo = req.getPathInfo();
+            long id = Long.parseLong(pathInfo.substring(1));
+
+            var studentToUpdateAsString = getBody(req);
+            var studentDTO = jsonService.fromJson(studentToUpdateAsString, StudentDTO.class);
+
+            studentService.updateStudent(id, studentDTO);
+            resp.setStatus(HttpServletResponse.SC_OK); // HTTP 200 OK
+        } catch (StudentNotFoundException e) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND); // HTTP 404 Not Found
+            resp.getWriter().write(e.getMessage());
+        } catch (StudentAlreadyExistsException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST); // HTTP 400 Bad Request
+            resp.getWriter().write("Failed to update student: " + e.getMessage());
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            String pathInfo = req.getPathInfo();
+            long id = Long.parseLong(pathInfo.substring(1));
+            studentService.deleteStudent(id);
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (StudentNotFoundException e) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().write(e.getMessage());
+        }
+    }
+
+    private Object getPathInfo(HttpServletRequest req) throws IOException {
+        String pathInfo = req.getPathInfo();
         String name = req.getParameter("name");
         String surname = req.getParameter("surname");
         Object result = null;
@@ -72,23 +115,9 @@ public class StudentServlet extends HttpServlet {
         return result;
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        var studentToSaveAsString = getBody(req);
-        var studentDTO = jsonService.fromJson(studentToSaveAsString, StudentDTO.class);
-        studentService.addStudent(studentDTO);
-    }
-
-
-    @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPut(req, resp);
-    }
-
-
     public static String getBody(HttpServletRequest request) throws IOException {
 
-        String body = null;
+        String body = "";
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader bufferedReader = null;
 

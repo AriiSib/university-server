@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.khokhlov.universityserver.model.data.MemoryDB;
-import com.khokhlov.universityserver.service.JsonService;
-import com.khokhlov.universityserver.service.MappingService;
-import com.khokhlov.universityserver.service.PropertyService;
-import com.khokhlov.universityserver.service.StudentService;
+import com.khokhlov.universityserver.service.*;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -33,11 +30,14 @@ public class AppContextListener implements ServletContextListener {
 
         PropertyService propertyService = new PropertyService();
         StudentService studentService = new StudentService(memoryDB, mappingService);
+        TeacherService teacherService = new TeacherService(memoryDB, mappingService);
         JsonService jsonService = new JsonService(objectMapper);
 
 
         ctx.setAttribute(PROPERTY_SERVICE, propertyService);
         ctx.setAttribute(STUDENT_SERVICE, studentService);
+        ctx.setAttribute(TEACHER_SERVICE, teacherService);
+
         ctx.setAttribute(JSON_SERVICE, jsonService);
 
         ServletContextListener.super.contextInitialized(sce);

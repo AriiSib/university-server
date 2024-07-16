@@ -1,11 +1,12 @@
 package com.khokhlov.universityserver.service;
 
+import com.khokhlov.universityserver.exception.StudentAlreadyExistsException;
+import com.khokhlov.universityserver.exception.StudentNotFoundException;
 import com.khokhlov.universityserver.model.Student;
 import com.khokhlov.universityserver.model.data.MemoryDB;
 import com.khokhlov.universityserver.model.dto.StudentDTO;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ public class StudentService {
         this.DB = DB;
         this.mappingService = mappingService;
         this.idGenerator = new AtomicLong(initializeIdGenerator(DB));
+        idGenerator.incrementAndGet(); //starting from 1
     }
 
     private long initializeIdGenerator(MemoryDB DB) {
@@ -57,8 +59,33 @@ public class StudentService {
                 .collect(Collectors.toList());
     }
 
-    public void addStudent(StudentDTO student) {
-        long newId = idGenerator.incrementAndGet();
-        DB.getStudents().put(newId, mappingService.fromStudentDTO(newId, student));
+    public void addStudent(StudentDTO studentDTO) {
+        Student student = mappingService.fromStudentDTO(idGenerator.get(), studentDTO);
+        if (!DB.getStudents().containsValue(student)) {
+            DB.getStudents().put(idGenerator.getAndIncrement(), student);
+        } else {
+            throw new StudentAlreadyExistsException("Student already exists");
+        }
+    }
+
+    public void updateStudent(long id, StudentDTO studentDTO) {
+        if (DB.getStudents().containsKey(id)) {
+            Student updatedStudent = mappingService.fromStudentDTO(id, studentDTO);
+            if (!DB.getStudents().containsValue(updatedStudent)) {
+                DB.getStudents().put(id, updatedStudent);
+            } else {
+                throw new StudentAlreadyExistsException("Student already exists");
+            }
+        } else {
+            throw new StudentNotFoundException("Student with id " + id + " not found");
+        }
+    }
+
+    public void deleteStudent(long id) {
+        if (DB.getStudents().containsKey(id)) {
+            DB.getStudents().remove(id);
+        } else {
+            throw new StudentNotFoundException("Student with id " + id + " not found");
+        }
     }
 }
