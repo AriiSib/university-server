@@ -17,7 +17,7 @@ import java.io.*;
 import static com.khokhlov.universityserver.consts.Consts.*;
 
 
-@WebServlet(name = "studentService", value = "/students")
+@WebServlet(name = "studentService", value = "/students/*")
 @RequiredArgsConstructor
 public class StudentServlet extends HttpServlet {
 
@@ -34,7 +34,13 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        var result = studentService.getAllStudents();
+
+        Object result = getPathInfo(req, resp);
+
+        System.out.println(req.getPathInfo());
+        System.out.println(req.getAttribute("name"));
+        System.out.println(req.getParameter("name"));
+        System.out.println(req.getRequestURI());
 
         resp.setContentType("application/json");
         PrintWriter out = resp.getWriter();
@@ -42,11 +48,35 @@ public class StudentServlet extends HttpServlet {
         out.flush();
     }
 
+    private Object getPathInfo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String pathInfo = req.getPathInfo(); // /{id} или /name/{name} или /surname/{surname}
+        String name = req.getParameter("name");
+        String surname = req.getParameter("surname");
+        Object result = null;
+
+        if (pathInfo != null && pathInfo.startsWith("/")) {
+            String[] pathPart = pathInfo.substring(1).split("/");
+            if (pathPart.length == 1 && pathPart[0].matches("\\d+")) {
+                long id = Integer.parseInt(pathPart[0]);
+                result = studentService.getStudentById(id);
+            }
+        } else if (name != null && surname != null) {
+            result = studentService.getStudentsByNameAndSurname(name, surname);
+        } else if (name != null) {
+            result = studentService.getStudentsByName(name);
+        } else if (surname != null) {
+            result = studentService.getStudentsBySurname(surname);
+        } else {
+            result = studentService.getAllStudents();
+        }
+        return result;
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      var studentToSaveAsString =  getBody(req);
-      var studentDTO = jsonService.fromJson(studentToSaveAsString, StudentDTO.class);
-      studentService.addStudent(studentDTO);
+        var studentToSaveAsString = getBody(req);
+        var studentDTO = jsonService.fromJson(studentToSaveAsString, StudentDTO.class);
+        studentService.addStudent(studentDTO);
     }
 
 

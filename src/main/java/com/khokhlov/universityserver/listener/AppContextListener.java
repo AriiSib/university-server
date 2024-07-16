@@ -2,6 +2,7 @@ package com.khokhlov.universityserver.listener;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.khokhlov.universityserver.model.data.MemoryDB;
 import com.khokhlov.universityserver.service.JsonService;
@@ -26,6 +27,7 @@ public class AppContextListener implements ServletContextListener {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.registerModule(new Jdk8Module());
 
         MappingService mappingService = new MappingService();
 

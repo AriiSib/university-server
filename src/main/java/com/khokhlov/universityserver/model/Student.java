@@ -8,16 +8,14 @@ import java.time.LocalDate;
 public class Student {
     private long id;
     private String name;
-    private String firstName;
-    private String lastName;
+    private String surname;
     private LocalDate birthDate;
     private String phoneNumber;
 
-    public Student(long id, String name, String firstName, String lastName, LocalDate birthDate, String phoneNumber) {
+    public Student(long id, String name, String surname, LocalDate birthDate, String phoneNumber) {
         this.id = id;
         this.name = name;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.surname = surname;
         this.birthDate = birthDate;
         this.phoneNumber = phoneNumber;
     }

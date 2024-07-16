@@ -10,8 +10,7 @@ public class MappingService {
     Student fromStudentDTO(long id, StudentDTO studentDTO) {
         return new Student(id,
                 studentDTO.getName(),
-                studentDTO.getFirstName(),
-                studentDTO.getLastName(),
+                studentDTO.getSurname(),
                 LocalDate.now(),
                 studentDTO.getPhoneNumber());
     }

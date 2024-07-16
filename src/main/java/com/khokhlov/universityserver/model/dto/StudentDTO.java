@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class StudentDTO {
     public String name;
-    public String firstName;
-    public String lastName;
+    public String surname;
     public String phoneNumber;
 }
