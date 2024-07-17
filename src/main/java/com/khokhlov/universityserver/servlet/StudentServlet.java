@@ -62,17 +62,17 @@ public class StudentServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             String pathInfo = req.getPathInfo();
-            long id = Long.parseLong(pathInfo.substring(1));
+            long studentId = Long.parseLong(pathInfo.substring(1));
 
             var studentToUpdateAsString = getBody(req);
             var studentDTO = jsonService.fromJson(studentToUpdateAsString, StudentDTO.class);
 
-            studentService.updateStudent(id, studentDTO);
+            studentService.updateStudent(studentId, studentDTO);
             resp.setStatus(HttpServletResponse.SC_OK); // HTTP 200 OK
         } catch (StudentNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND); // HTTP 404 Not Found
             resp.getWriter().write(e.getMessage());
-        } catch (StudentAlreadyExistsException e) {
+        } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST); // HTTP 400 Bad Request
             resp.getWriter().write("Failed to update student: " + e.getMessage());
         }
@@ -93,8 +93,8 @@ public class StudentServlet extends HttpServlet {
 
     private Object getPathInfo(HttpServletRequest req) throws IOException {
         String pathInfo = req.getPathInfo();
-        String name = req.getParameter("name");
-        String surname = req.getParameter("surname");
+        String name = req.getParameter(NAME);
+        String surname = req.getParameter(SURNAME);
         Object result = null;
 
         if (pathInfo != null && pathInfo.startsWith("/")) {

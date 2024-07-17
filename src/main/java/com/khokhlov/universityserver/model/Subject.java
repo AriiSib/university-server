@@ -8,7 +8,11 @@ import lombok.RequiredArgsConstructor;
 public enum Subject {
     MATH("Math"),
     ECONOMICS("Economics"),
-    PROGRAMMING("Programming");
+    PROGRAMMING("Programming"),
+    PHYSICS("Physics"),
+    PHILOSOPHY("Philosophy"),
+    CHEMISTRY("Chemistry"),
+    HISTORY("History");
 
     private final String value;
 

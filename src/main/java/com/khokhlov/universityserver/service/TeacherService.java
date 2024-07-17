@@ -1,9 +1,11 @@
 package com.khokhlov.universityserver.service;
 
-import com.khokhlov.universityserver.model.Student;
+import com.khokhlov.universityserver.exception.TeacherAlreadyExistsException;
+import com.khokhlov.universityserver.exception.TeacherNotFoundException;
+import com.khokhlov.universityserver.model.Subject;
 import com.khokhlov.universityserver.model.Teacher;
 import com.khokhlov.universityserver.model.data.MemoryDB;
-import com.khokhlov.universityserver.model.dto.StudentDTO;
+import com.khokhlov.universityserver.model.dto.SubjectDTO;
 import com.khokhlov.universityserver.model.dto.TeacherDTO;
 
 import java.util.Collection;
@@ -18,6 +20,7 @@ public class TeacherService {
         this.DB = DB;
         this.mappingService = mappingService;
         this.idGenerator = new AtomicLong(initializeIdGenerator(DB));
+        idGenerator.incrementAndGet();
     }
 
     private long initializeIdGenerator(MemoryDB DB) {
@@ -32,8 +35,26 @@ public class TeacherService {
     }
 
     public void addTeacher(TeacherDTO teacherDTO) {
-        long newId = idGenerator.incrementAndGet();
-        DB.getTeachers().put(newId, mappingService.fromTeacherDTO(newId, teacherDTO));
+        Teacher teacher = mappingService.fromTeacherDTO(idGenerator.get(), teacherDTO);
+        if (!DB.getTeachers().containsValue(teacher)) {
+            DB.getTeachers().put(idGenerator.getAndIncrement(), teacher);
+        } else {
+            throw new TeacherAlreadyExistsException("Teacher already exists");
+        }
+    }
+
+    public void addSubjectToTeacher(long teacherId, SubjectDTO subjectDTO) {
+        if (DB.getTeachers().containsKey(teacherId)) {
+            Teacher teacher = DB.getTeachers().get(teacherId);
+            Subject newSubject = Subject.fromValue(subjectDTO.getSubject());
+            if (!teacher.getSubjects().contains(newSubject)) {
+                teacher.getSubjects().add(newSubject);
+            } else {
+                throw new IllegalArgumentException("Subject " + subjectDTO.getSubject() + " already exists for teacher");
+            }
+        } else {
+            throw new TeacherNotFoundException("Teacher with id " + teacherId + " not found");
+        }
     }
 
 }

@@ -68,16 +68,16 @@ public class StudentService {
         }
     }
 
-    public void updateStudent(long id, StudentDTO studentDTO) {
-        if (DB.getStudents().containsKey(id)) {
-            Student updatedStudent = mappingService.fromStudentDTO(id, studentDTO);
+    public void updateStudent(long studentId, StudentDTO studentDTO) {
+        if (DB.getStudents().containsKey(studentId)) {
+            Student updatedStudent = mappingService.fromStudentDTO(studentId, studentDTO);
             if (!DB.getStudents().containsValue(updatedStudent)) {
-                DB.getStudents().put(id, updatedStudent);
+                DB.getStudents().put(studentId, updatedStudent);
             } else {
                 throw new StudentAlreadyExistsException("Student already exists");
             }
         } else {
-            throw new StudentNotFoundException("Student with id " + id + " not found");
+            throw new StudentNotFoundException("Student with id " + studentId + " not found");
         }
     }
 
