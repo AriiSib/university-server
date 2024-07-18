@@ -1,7 +1,9 @@
 package com.khokhlov.universityserver.service;
 
+import com.khokhlov.universityserver.model.Group;
 import com.khokhlov.universityserver.model.Student;
 import com.khokhlov.universityserver.model.Teacher;
+import com.khokhlov.universityserver.model.dto.GroupDTO;
 import com.khokhlov.universityserver.model.dto.StudentDTO;
 import com.khokhlov.universityserver.model.dto.TeacherDTO;
 
@@ -18,13 +20,17 @@ public class MappingService {
     }
 
     Teacher fromTeacherDTO(long id, TeacherDTO teacherDTO) {
-
-
         return new Teacher(id,
                 teacherDTO.getName(),
                 teacherDTO.getSurname(),
                 teacherDTO.getExperience(),
                 teacherDTO.getSubjects());
+    }
+
+    Group fromGroupDTO(long id, GroupDTO groupDTO) {
+        return new Group(id,
+                groupDTO.getNumber(),
+                groupDTO.getStudentsList());
     }
 
 }

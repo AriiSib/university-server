@@ -34,7 +34,6 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         Object result = getPathInfo(req);
 
         resp.setContentType("application/json");

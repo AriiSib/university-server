@@ -24,7 +24,7 @@ public class TeacherService {
     }
 
     private long initializeIdGenerator(MemoryDB DB) {
-        return DB.getStudents().keySet().stream()
+        return DB.getTeachers().keySet().stream()
                 .mapToLong(Long::longValue)
                 .max()
                 .orElse(0L);

@@ -31,12 +31,14 @@ public class AppContextListener implements ServletContextListener {
         PropertyService propertyService = new PropertyService();
         StudentService studentService = new StudentService(memoryDB, mappingService);
         TeacherService teacherService = new TeacherService(memoryDB, mappingService);
+        GroupService groupService = new GroupService(memoryDB, mappingService, studentService, propertyService);
         JsonService jsonService = new JsonService(objectMapper);
 
 
         ctx.setAttribute(PROPERTY_SERVICE, propertyService);
         ctx.setAttribute(STUDENT_SERVICE, studentService);
         ctx.setAttribute(TEACHER_SERVICE, teacherService);
+        ctx.setAttribute(GROUP_SERVICE, groupService);
 
         ctx.setAttribute(JSON_SERVICE, jsonService);
 
