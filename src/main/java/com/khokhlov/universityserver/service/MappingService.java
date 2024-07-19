@@ -3,9 +3,11 @@ package com.khokhlov.universityserver.service;
 import com.khokhlov.universityserver.model.Group;
 import com.khokhlov.universityserver.model.Student;
 import com.khokhlov.universityserver.model.Teacher;
+import com.khokhlov.universityserver.model.Timetable;
 import com.khokhlov.universityserver.model.dto.GroupDTO;
 import com.khokhlov.universityserver.model.dto.StudentDTO;
 import com.khokhlov.universityserver.model.dto.TeacherDTO;
+import com.khokhlov.universityserver.model.dto.TimetableDTO;
 
 import java.time.LocalDate;
 
@@ -31,6 +33,23 @@ public class MappingService {
         return new Group(id,
                 groupDTO.getNumber(),
                 groupDTO.getStudentsList());
+    }
+
+
+    Timetable fromTimetableDTO(long id, TimetableDTO timetableDTO) {
+        return new Timetable(id,
+                timetableDTO.getGroupId(),
+                timetableDTO.getTeacherId(),
+                timetableDTO.getStartDateTime(),
+                timetableDTO.getEndDateTime());
+    }
+
+    public Timetable fromTimetableDTO(TimetableDTO timetableDTO) {
+        return new Timetable(0,
+                timetableDTO.getGroupId(),
+                timetableDTO.getTeacherId(),
+                timetableDTO.getStartDateTime(),
+                timetableDTO.getEndDateTime());
     }
 
 }

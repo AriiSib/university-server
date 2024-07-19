@@ -1,6 +1,7 @@
 package com.khokhlov.universityserver.service;
 
 import com.khokhlov.universityserver.exception.GroupAlreadyExistsException;
+import com.khokhlov.universityserver.exception.GroupNotFoundException;
 import com.khokhlov.universityserver.exception.StudentAlreadyExistsException;
 import com.khokhlov.universityserver.exception.StudentNotFoundException;
 import com.khokhlov.universityserver.model.Group;
@@ -90,27 +91,21 @@ public class GroupService {
     }
 
     public boolean addStudentsToGroup(long groupNumber, List<Student> studentsToAdd) {
-        Optional<Group> groupOptional = getAllGroups().stream()
-                .filter(group -> group.getNumber() == groupNumber)
-                .findFirst();
+        Group group = getGroupByNumber(String.valueOf(groupNumber))
+                .orElseThrow(() -> new GroupNotFoundException("Group not found with number " + groupNumber));
 
-        if (groupOptional.isPresent()) {
-            Group group = groupOptional.get();
-            List<Student> currentStudents = group.getStudents();
+        List<Student> currentStudents = group.getStudents();
 
-            for (Student student : studentsToAdd) {
-                if (!currentStudents.contains(student)) {
-                    currentStudents.add(student);
-                } else {
-                    throw new StudentAlreadyExistsException("Student with id " + student.getId() + " already exists");
-                }
+        for (Student student : studentsToAdd) {
+            if (!currentStudents.contains(student)) {
+                currentStudents.add(student);
+            } else {
+                throw new StudentAlreadyExistsException("Student with id " + student.getId() + " already exists");
             }
-            return true;
-        } else {
-            return false;
         }
+        return true;
     }
-
-
 }
+
+
 

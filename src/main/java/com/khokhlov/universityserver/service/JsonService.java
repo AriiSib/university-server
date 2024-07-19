@@ -1,12 +1,9 @@
 package com.khokhlov.universityserver.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khokhlov.universityserver.model.Student;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.util.List;
 
 @RequiredArgsConstructor
 public class JsonService {

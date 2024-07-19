@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@Getter
 public class PropertyService {
 
-    @Getter
     private Properties properties;
 
     public PropertyService() {

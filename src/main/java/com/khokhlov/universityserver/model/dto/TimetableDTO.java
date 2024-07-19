@@ -5,12 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class StudentDTO {
-    private String name;
-    private String surname;
-    private String phoneNumber;
+public class TimetableDTO {
+    private long groupId;
+    private long teacherId;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
 }
