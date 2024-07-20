@@ -45,11 +45,18 @@ public class TeacherServlet extends HttpServlet {
         try {
             var teacherToSaveAsString = getBody(req);
             var teacherDTO = jsonService.fromJson(teacherToSaveAsString, TeacherDTO.class);
+            teacherDTO.validate();
             teacherService.addTeacher(teacherDTO);
-            resp.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setStatus(HttpServletResponse.SC_CREATED); // HTTP 201 Created
         } catch (TeacherAlreadyExistsException e) {
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
-            resp.getWriter().write(e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_CONFLICT); // HTTP 409 Conflict
+            resp.getWriter().write("Teacher already exists: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST); // HTTP 400 Bad Request
+            resp.getWriter().write("Invalid input: " + e.getMessage());
+        } catch (Exception e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // HTTP 500 Internal Server Error
+            resp.getWriter().write("An unexpected error occurred: " + e.getMessage());
         }
     }
 

@@ -4,6 +4,7 @@ import com.khokhlov.universityserver.exception.TimetableNotFoundException;
 import com.khokhlov.universityserver.model.dto.TimetableDTO;
 import com.khokhlov.universityserver.service.JsonService;
 import com.khokhlov.universityserver.service.TimetableService;
+import com.khokhlov.universityserver.validator.Validator;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -49,8 +50,9 @@ public class TimetableServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             String timetableToSaveAsString = getBody(req);
-            TimetableDTO timetable = jsonService.fromJson(timetableToSaveAsString, TimetableDTO.class);
-            timetableService.addTimetable(timetable);
+            TimetableDTO timetableDTO = jsonService.fromJson(timetableToSaveAsString, TimetableDTO.class);
+            Validator.validateTimetable(timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime());
+            timetableService.addTimetable(timetableDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -66,6 +68,7 @@ public class TimetableServlet extends HttpServlet {
 
             String body = getBody(req);
             TimetableDTO timetableDTO = jsonService.fromJson(body, TimetableDTO.class);
+            Validator.validateTimetable(timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime());
             timetableService.updateTimetable(date, timetableDTO);
             resp.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {

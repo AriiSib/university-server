@@ -29,4 +29,8 @@ public class PropertyService {
             throw new RuntimeException("Error loading properties file from " + PATH_TO_PROPERTIES, e);
         }
     }
+
+    public int getMaxClasses() {
+        return Integer.parseInt(properties.getProperty("max.classes"));
+    }
 }

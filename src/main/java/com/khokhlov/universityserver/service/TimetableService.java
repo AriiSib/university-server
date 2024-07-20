@@ -16,11 +16,13 @@ import java.util.stream.Collectors;
 public class TimetableService {
     private final MemoryDB DB;
     private final MappingService mappingService;
+    private final PropertyService propertyService;
     private final AtomicLong idGenerator;
 
-    public TimetableService(MemoryDB DB, MappingService mappingService) {
+    public TimetableService(MemoryDB DB, MappingService mappingService, PropertyService propertyService) {
         this.DB = DB;
         this.mappingService = mappingService;
+        this.propertyService = propertyService;
         this.idGenerator = new AtomicLong(initializeIdGenerator(DB));
         idGenerator.incrementAndGet();
     }
@@ -89,12 +91,15 @@ public class TimetableService {
     public void addTimetable(TimetableDTO timetableDTO) {
         Timetable newTimetable = mappingService.fromTimetableDTO(idGenerator.get(), timetableDTO);
         if (!DB.getTimetables().containsValue(newTimetable)) {
-            DB.getTimetables().put(idGenerator.getAndIncrement(), newTimetable);
+            if (isScheduleValid(newTimetable, newTimetable.getTeacherId())) {
+                DB.getTimetables().put(idGenerator.getAndIncrement(), newTimetable);
+            } else {
+                throw new IllegalArgumentException("The total number of classes for the day exceeds the limit of " + propertyService.getMaxClasses());
+            }
         } else {
             throw new TimetableAlreadyExistsException("Timetable already exists");
         }
     }
-
 
     public void updateTimetable(LocalDate date, TimetableDTO updatedTimetableDTO) {
         Timetable updatedTimetable = mappingService.fromTimetableDTO(updatedTimetableDTO);
@@ -104,11 +109,27 @@ public class TimetableService {
             throw new TimetableNotFoundException("Timetable not found for the given date");
         }
 
-        Timetable timetable = timetables.getFirst();
+        Timetable timetable = timetables.get(0);
 
         timetable.setGroupId(updatedTimetable.getGroupId());
         timetable.setTeacherId(updatedTimetable.getTeacherId());
         timetable.setStartDateTime(updatedTimetable.getStartDateTime());
         timetable.setEndDateTime(updatedTimetable.getEndDateTime());
+
+        if (!isScheduleValid(timetable, timetable.getTeacherId())) {
+            throw new IllegalArgumentException("The total number of classes for the day exceeds the limit of "
+                    + propertyService.getMaxClasses());
+        }
+    }
+
+    private boolean isScheduleValid(Timetable newTimetable, long teacherId) {
+        LocalDate date = newTimetable.getStartDateTime().toLocalDate();
+        long totalClasses = DB.getTimetables().values().stream()
+                .filter(timetable -> timetable.getStartDateTime().toLocalDate().equals(date)
+                        && timetable.getTeacherId() == teacherId)
+                .count();
+
+        totalClasses += 1;
+        return totalClasses <= propertyService.getMaxClasses();
     }
 }

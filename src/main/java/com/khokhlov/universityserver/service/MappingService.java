@@ -17,7 +17,7 @@ public class MappingService {
         return new Student(id,
                 studentDTO.getName(),
                 studentDTO.getSurname(),
-                LocalDate.now(),
+                studentDTO.getBirthdate(),
                 studentDTO.getPhoneNumber());
     }
 

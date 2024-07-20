@@ -48,11 +48,18 @@ public class StudentServlet extends HttpServlet {
         try {
             var studentToSaveAsString = getBody(req);
             var studentDTO = jsonService.fromJson(studentToSaveAsString, StudentDTO.class);
+            studentDTO.validate();
             studentService.addStudent(studentDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (StudentAlreadyExistsException e) {
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
             resp.getWriter().write(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("Invalid input: " + e.getMessage());
+        } catch (Exception e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("An unexpected error occurred: " + e.getMessage());
         }
     }
 
@@ -65,14 +72,15 @@ public class StudentServlet extends HttpServlet {
 
             var studentToUpdateAsString = getBody(req);
             var studentDTO = jsonService.fromJson(studentToUpdateAsString, StudentDTO.class);
+            studentDTO.validate();
 
             studentService.updateStudent(studentId, studentDTO);
-            resp.setStatus(HttpServletResponse.SC_OK); // HTTP 200 OK
+            resp.setStatus(HttpServletResponse.SC_OK);
         } catch (StudentNotFoundException e) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND); // HTTP 404 Not Found
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write(e.getMessage());
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST); // HTTP 400 Bad Request
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Failed to update student: " + e.getMessage());
         }
     }

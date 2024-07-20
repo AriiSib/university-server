@@ -45,7 +45,7 @@ public class AppContextListener implements ServletContextListener {
         StudentService studentService = new StudentService(memoryDB, mappingService);
         TeacherService teacherService = new TeacherService(memoryDB, mappingService);
         GroupService groupService = new GroupService(memoryDB, mappingService, studentService, propertyService);
-        TimetableService timetableService = new TimetableService(memoryDB, mappingService);
+        TimetableService timetableService = new TimetableService(memoryDB, mappingService, propertyService);
         JsonService jsonService = new JsonService(objectMapper);
 
         ctx.setAttribute(PROPERTY_SERVICE, propertyService);
@@ -59,47 +59,3 @@ public class AppContextListener implements ServletContextListener {
         ServletContextListener.super.contextInitialized(sce);
     }
 }
-
-/*
-@WebListener
-public class AppContextListener implements ServletContextListener {
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        ServletContext ctx = sce.getServletContext();
-
-        MemoryDB memoryDB = new MemoryDB();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new Jdk8Module());
-        JavaTimeModule module = new JavaTimeModule();
-        module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        objectMapper.registerModule(module);
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        MappingService mappingService = new MappingService();
-
-        PropertyService propertyService = new PropertyService();
-        StudentService studentService = new StudentService(memoryDB, mappingService);
-        TeacherService teacherService = new TeacherService(memoryDB, mappingService);
-        GroupService groupService = new GroupService(memoryDB, mappingService, studentService, propertyService);
-        TimetableService timetableService = new TimetableService(memoryDB, mappingService);
-        JsonService jsonService = new JsonService(objectMapper);
-
-
-        ctx.setAttribute(PROPERTY_SERVICE, propertyService);
-        ctx.setAttribute(STUDENT_SERVICE, studentService);
-        ctx.setAttribute(TEACHER_SERVICE, teacherService);
-        ctx.setAttribute(GROUP_SERVICE, groupService);
-        ctx.setAttribute(TIMETABLE_SERVICE, timetableService);
-
-        ctx.setAttribute(JSON_SERVICE, jsonService);
-
-        ServletContextListener.super.contextInitialized(sce);
-    }
-}
- */
-
