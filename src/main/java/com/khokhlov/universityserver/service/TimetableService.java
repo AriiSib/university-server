@@ -94,7 +94,7 @@ public class TimetableService {
             if (isScheduleValid(newTimetable, newTimetable.getTeacherId())) {
                 DB.getTimetables().put(idGenerator.getAndIncrement(), newTimetable);
             } else {
-                throw new IllegalArgumentException("The total number of classes for the day exceeds the limit of " + propertyService.getMaxClasses());
+                throw new IllegalArgumentException("The total number of classes for the day exceeds the limit of " + propertyService.getMaxClassesTime());
             }
         } else {
             throw new TimetableAlreadyExistsException("Timetable already exists");
@@ -118,7 +118,7 @@ public class TimetableService {
 
         if (!isScheduleValid(timetable, timetable.getTeacherId())) {
             throw new IllegalArgumentException("The total number of classes for the day exceeds the limit of "
-                    + propertyService.getMaxClasses());
+                    + propertyService.getMaxClassesTime());
         }
     }
 
@@ -130,6 +130,6 @@ public class TimetableService {
                 .count();
 
         totalClasses += 1;
-        return totalClasses <= propertyService.getMaxClasses();
+        return totalClasses <= propertyService.getMaxClassesTime();
     }
 }

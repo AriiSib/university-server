@@ -53,19 +53,31 @@ public class GroupService {
 
     public List<Student> getStudentsById(GroupDTO groupDTO) {
         List<Student> students = new ArrayList<>();
-        if (groupDTO.getStudents().length >= Integer.parseInt(propertyService.getProperties().getProperty("min.students"))) {
-            for (int studentId : groupDTO.getStudents()) {
-                studentService.getStudentById(studentId).ifPresentOrElse(students::add,
-                        () -> {
-                            throw new StudentNotFoundException("Student with id " + studentId + " not found");
-                        });
-            }
+
+        int minStudents = propertyService.getMinStudents();
+        int maxStudents = propertyService.getMaxStudents();
+        int studentCount = groupDTO.getStudents().length;
+
+        if (studentCount < minStudents) {
+            throw new IllegalArgumentException("Group must have at least " + minStudents + " students.");
+        } else if (studentCount > maxStudents) {
+            throw new IllegalArgumentException("Group cannot have more than " + maxStudents + " students.");
         }
+
+        for (int studentId : groupDTO.getStudents()) {
+            studentService.getStudentById(studentId)
+                    .ifPresentOrElse(
+                            students::add,
+                            () -> {
+                                throw new StudentNotFoundException("Student with id " + studentId + " not found");
+                            }
+                    );
+        }
+
         return students;
     }
 
     public Optional<Group> getGroupByNumberAndSurname(String groupNumber, String surname) {
-        //REGEX
         long number = Long.parseLong(groupNumber);
         return getAllGroups().stream()
                 .filter(group -> group.getNumber() == number &&
@@ -75,7 +87,6 @@ public class GroupService {
     }
 
     public Optional<Group> getGroupByNumber(String groupNumber) {
-        //REGEX
         long number = Long.parseLong(groupNumber);
         return getAllGroups().stream()
                 .filter(group -> group.getNumber() == number)
@@ -83,7 +94,6 @@ public class GroupService {
     }
 
     public Optional<Group> getGroupBySurname(String surname) {
-        //REGEX
         return getAllGroups().stream()
                 .filter(group -> group.getStudents().stream()
                         .anyMatch(student -> student.getSurname().equalsIgnoreCase(surname)))
@@ -95,6 +105,11 @@ public class GroupService {
                 .orElseThrow(() -> new GroupNotFoundException("Group not found with number " + groupNumber));
 
         List<Student> currentStudents = group.getStudents();
+        int maxStudents = propertyService.getMaxStudents();
+
+        if (currentStudents.size() + studentsToAdd.size() > maxStudents) {
+            throw new IllegalArgumentException("Adding students will exceed the maximum number of " + maxStudents + " students.");
+        }
 
         for (Student student : studentsToAdd) {
             if (!currentStudents.contains(student)) {

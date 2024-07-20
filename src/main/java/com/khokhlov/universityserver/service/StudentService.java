@@ -21,7 +21,7 @@ public class StudentService {
         this.DB = DB;
         this.mappingService = mappingService;
         this.idGenerator = new AtomicLong(initializeIdGenerator(DB));
-        idGenerator.incrementAndGet(); //starting from 1
+        idGenerator.incrementAndGet(); //start from 1
     }
 
     private long initializeIdGenerator(MemoryDB DB) {

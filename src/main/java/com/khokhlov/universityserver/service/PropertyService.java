@@ -9,13 +9,14 @@ import java.util.Properties;
 @Getter
 public class PropertyService {
 
+    private static final String PATH_TO_PROPERTIES = "/config.properties";
+
     private Properties properties;
 
     public PropertyService() {
         loadProperties();
     }
 
-    private static final String PATH_TO_PROPERTIES = "/config.properties";
 
     private void loadProperties() {
         try (InputStream inputStream = PropertyService.class.getResourceAsStream(PATH_TO_PROPERTIES)) {
@@ -30,7 +31,19 @@ public class PropertyService {
         }
     }
 
-    public int getMaxClasses() {
-        return Integer.parseInt(properties.getProperty("max.classes"));
+    public int getMinClassesTime() {
+        return Integer.parseInt(properties.getProperty("min.classes")) * 90;
+    }
+
+    public int getMaxClassesTime() {
+        return Integer.parseInt(properties.getProperty("max.classes")) * 90;
+    }
+
+    public int getMinStudents() {
+        return Integer.parseInt(properties.getProperty("min.students"));
+    }
+
+    public int getMaxStudents() {
+        return Integer.parseInt(properties.getProperty("max.students"));
     }
 }

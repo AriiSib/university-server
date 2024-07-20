@@ -30,5 +30,4 @@ public class JsonService {
             throw new InvalidJsonException("Invalid JSON format");
         }
     }
-
 }

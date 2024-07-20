@@ -9,7 +9,6 @@ import com.khokhlov.universityserver.model.dto.StudentDTO;
 import com.khokhlov.universityserver.model.dto.TeacherDTO;
 import com.khokhlov.universityserver.model.dto.TimetableDTO;
 
-import java.time.LocalDate;
 
 public class MappingService {
 

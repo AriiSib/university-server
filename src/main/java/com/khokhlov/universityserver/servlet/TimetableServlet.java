@@ -3,6 +3,7 @@ package com.khokhlov.universityserver.servlet;
 import com.khokhlov.universityserver.exception.TimetableNotFoundException;
 import com.khokhlov.universityserver.model.dto.TimetableDTO;
 import com.khokhlov.universityserver.service.JsonService;
+import com.khokhlov.universityserver.service.PropertyService;
 import com.khokhlov.universityserver.service.TimetableService;
 import com.khokhlov.universityserver.validator.Validator;
 import jakarta.servlet.ServletConfig;
@@ -20,12 +21,12 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import static com.khokhlov.universityserver.consts.Consts.JSON_SERVICE;
-import static com.khokhlov.universityserver.consts.Consts.TIMETABLE_SERVICE;
+import static com.khokhlov.universityserver.consts.Consts.*;
 
 @WebServlet(name = "TimetableServlet", value = "/timetable/*")
 public class TimetableServlet extends HttpServlet {
     private TimetableService timetableService;
+    private PropertyService propertyService;
     private JsonService jsonService;
 
     @Override
@@ -33,6 +34,7 @@ public class TimetableServlet extends HttpServlet {
         super.init(config);
         ServletContext context = config.getServletContext();
         this.timetableService = (TimetableService) context.getAttribute(TIMETABLE_SERVICE);
+        this.propertyService = (PropertyService) context.getAttribute(PROPERTY_SERVICE);
         this.jsonService = (JsonService) context.getAttribute(JSON_SERVICE);
     }
 
@@ -51,7 +53,7 @@ public class TimetableServlet extends HttpServlet {
         try {
             String timetableToSaveAsString = getBody(req);
             TimetableDTO timetableDTO = jsonService.fromJson(timetableToSaveAsString, TimetableDTO.class);
-            Validator.validateTimetable(timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime());
+            Validator.validateTimetable(timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime(), propertyService);
             timetableService.addTimetable(timetableDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (Exception e) {
@@ -68,7 +70,7 @@ public class TimetableServlet extends HttpServlet {
 
             String body = getBody(req);
             TimetableDTO timetableDTO = jsonService.fromJson(body, TimetableDTO.class);
-            Validator.validateTimetable(timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime());
+            Validator.validateTimetable(timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime(), propertyService);
             timetableService.updateTimetable(date, timetableDTO);
             resp.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
