@@ -121,6 +121,3 @@ public class GroupService {
         return true;
     }
 }
-
-
-

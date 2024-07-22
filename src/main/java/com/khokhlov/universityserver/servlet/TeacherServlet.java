@@ -47,15 +47,15 @@ public class TeacherServlet extends HttpServlet {
             var teacherDTO = jsonService.fromJson(teacherToSaveAsString, TeacherDTO.class);
             teacherDTO.validate();
             teacherService.addTeacher(teacherDTO);
-            resp.setStatus(HttpServletResponse.SC_CREATED); // HTTP 201 Created
+            resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (TeacherAlreadyExistsException e) {
-            resp.setStatus(HttpServletResponse.SC_CONFLICT); // HTTP 409 Conflict
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
             resp.getWriter().write("Teacher already exists: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST); // HTTP 400 Bad Request
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Invalid input: " + e.getMessage());
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // HTTP 500 Internal Server Error
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("An unexpected error occurred: " + e.getMessage());
         }
     }
@@ -70,12 +70,12 @@ public class TeacherServlet extends HttpServlet {
             var subjectDTO = jsonService.fromJson(subjectToAddAsString, SubjectDTO.class);
 
             teacherService.addSubjectToTeacher(teacherId, subjectDTO);
-            resp.setStatus(HttpServletResponse.SC_OK); // HTTP 200 OK
+            resp.setStatus(HttpServletResponse.SC_OK);
         } catch (TeacherNotFoundException e) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND); // HTTP 404 Not Found
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write(e.getMessage());
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST); // HTTP 400 Bad Request
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Failed to add subject: " + e.getMessage());
         }
     }

@@ -17,7 +17,3 @@ public class GroupDTO {
     private int[] students;
     private List<Student> studentsList;
 }
-
-
-
-

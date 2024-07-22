@@ -53,7 +53,6 @@ public class AppContextListener implements ServletContextListener {
         ctx.setAttribute(TEACHER_SERVICE, teacherService);
         ctx.setAttribute(GROUP_SERVICE, groupService);
         ctx.setAttribute(TIMETABLE_SERVICE, timetableService);
-
         ctx.setAttribute(JSON_SERVICE, jsonService);
 
         ServletContextListener.super.contextInitialized(sce);
