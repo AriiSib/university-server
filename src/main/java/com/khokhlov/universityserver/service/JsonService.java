@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.khokhlov.universityserver.exception.InvalidJsonException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 
 @RequiredArgsConstructor
+@Slf4j
 public class JsonService {
 
     private final ObjectMapper objectMapper;
@@ -16,8 +18,11 @@ public class JsonService {
     @SneakyThrows
     public String toJson(Object obj) {
         try {
-            return objectMapper.writeValueAsString(obj);
+            String json = objectMapper.writeValueAsString(obj);
+            log.info("Successfully serialized object to JSON: {}", json);
+            return json;
         } catch (JsonProcessingException e) {
+            log.error("Failed to serialize object to JSON: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to serialize object to JSON", e);
         }
     }
@@ -25,8 +30,11 @@ public class JsonService {
     @SneakyThrows
     public <T> T fromJson(String json, Class<T> clazz) {
         try {
-            return objectMapper.readValue(json, clazz);
+            T obj = objectMapper.readValue(json, clazz);
+            log.info("Successfully deserialized JSON to object of type {}: {}", clazz.getSimpleName(), obj);
+            return obj;
         } catch (JsonProcessingException e) {
+            log.error("Invalid JSON format: {}", e.getMessage(), e);
             throw new InvalidJsonException("Invalid JSON format");
         }
     }

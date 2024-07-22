@@ -1,6 +1,7 @@
 package com.khokhlov.universityserver.service;
 
 import com.khokhlov.universityserver.exception.GroupAlreadyExistsException;
+import com.khokhlov.universityserver.exception.GroupNotFoundException;
 import com.khokhlov.universityserver.exception.StudentAlreadyExistsException;
 import com.khokhlov.universityserver.exception.StudentNotFoundException;
 import com.khokhlov.universityserver.model.Group;
@@ -105,6 +106,11 @@ class GroupServiceTest {
     }
 
     @Test
+    void should_ThrowException_When_GroupNotFoundByNumberInAddStudents() {
+        assertThrows(GroupNotFoundException.class, () -> groupService.addStudentsToGroup(999L, Arrays.asList(student_1)));
+    }
+
+    @Test
     void should_AddStudentsToGroup_When_ValidDataProvided() {
         Group group = new Group(1L, 101L, new ArrayList<>());
         memoryDB.getGroups().put(1L, group);
@@ -130,6 +136,33 @@ class GroupServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> groupService.addStudentsToGroup(101L, studentsToAdd));
     }
+
+    @Test
+    void should_ThrowException_When_NotEnoughStudentsInGroup() {
+        int minStudents = propertyService.getMinStudents();
+        int[] studentIds = new int[minStudents - 1]; // меньше минимального числа студентов
+        for (int i = 0; i < studentIds.length; i++) {
+            studentIds[i] = i + 1;
+        }
+        groupDTO = new GroupDTO(101L, studentIds, Arrays.asList());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> groupService.getStudentsById(groupDTO));
+        assertEquals("Group must have at least " + minStudents + " students.", exception.getMessage());
+    }
+
+    @Test
+    void should_ThrowException_When_TooManyStudentsInGroup() {
+        int maxStudents = propertyService.getMaxStudents();
+        int[] studentIds = new int[maxStudents + 1]; // больше максимального числа студентов
+        for (int i = 0; i < studentIds.length; i++) {
+            studentIds[i] = i + 1;
+        }
+        groupDTO = new GroupDTO(101L, studentIds, Arrays.asList());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> groupService.getStudentsById(groupDTO));
+        assertEquals("Group cannot have more than " + maxStudents + " students.", exception.getMessage());
+    }
+
 
     @Test
     void should_ThrowException_When_StudentAlreadyExists() {

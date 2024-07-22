@@ -72,4 +72,20 @@ class MappingServiceTest {
 
         assertEquals(expectedTimetable, timetable);
     }
+
+    @Test
+    void should_MapTimetableDTOToTimetable_When_IdProvided() {
+        long id = 10L;
+        long groupId = 1L;
+        long teacherId = 2L;
+        LocalDateTime startDateTime = LocalDateTime.of(2024, 7, 21, 10, 0);
+        LocalDateTime endDateTime = LocalDateTime.of(2024, 7, 21, 12, 0);
+
+        TimetableDTO timetableDTO = new TimetableDTO(groupId, teacherId, startDateTime, endDateTime);
+        Timetable expectedTimetable = new Timetable(id, groupId, teacherId, startDateTime, endDateTime);
+
+        Timetable timetable = mappingService.fromTimetableDTO(id, timetableDTO);
+
+        assertEquals(expectedTimetable, timetable);
+    }
 }

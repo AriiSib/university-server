@@ -5,12 +5,14 @@ import com.khokhlov.universityserver.exception.StudentNotFoundException;
 import com.khokhlov.universityserver.model.Student;
 import com.khokhlov.universityserver.model.data.MemoryDB;
 import com.khokhlov.universityserver.model.dto.StudentDTO;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class StudentService {
 
     private final MemoryDB DB;
@@ -21,7 +23,8 @@ public class StudentService {
         this.DB = DB;
         this.mappingService = mappingService;
         this.idGenerator = new AtomicLong(initializeIdGenerator(DB));
-        idGenerator.incrementAndGet(); //start from 1
+        idGenerator.incrementAndGet();
+        log.info("StudentService initialized with ID generator starting from {}", idGenerator.get());
     }
 
     private long initializeIdGenerator(MemoryDB DB) {
@@ -63,7 +66,9 @@ public class StudentService {
         Student student = mappingService.fromStudentDTO(idGenerator.get(), studentDTO);
         if (!DB.getStudents().containsValue(student)) {
             DB.getStudents().put(idGenerator.getAndIncrement(), student);
+            log.info("Added student with ID {}: {}", idGenerator.get() - 1, student);
         } else {
+            log.warn("Attempted to add an existing student: {}", student);
             throw new StudentAlreadyExistsException("Student already exists");
         }
     }
@@ -73,10 +78,13 @@ public class StudentService {
             Student updatedStudent = mappingService.fromStudentDTO(studentId, studentDTO);
             if (!DB.getStudents().containsValue(updatedStudent)) {
                 DB.getStudents().put(studentId, updatedStudent);
+                log.info("Updated student with ID {}: {}", studentId, updatedStudent);
             } else {
+                log.warn("Attempted to update with an existing student: {}", updatedStudent);
                 throw new StudentAlreadyExistsException("Student already exists");
             }
         } else {
+            log.error("Attempted to update non-existing student with ID {}", studentId);
             throw new StudentNotFoundException("Student with id " + studentId + " not found");
         }
     }
@@ -84,7 +92,9 @@ public class StudentService {
     public void deleteStudent(long id) {
         if (DB.getStudents().containsKey(id)) {
             DB.getStudents().remove(id);
+            log.info("Deleted student with ID {}", id);
         } else {
+            log.error("Attempted to delete non-existing student with ID {}", id);
             throw new StudentNotFoundException("Student with id " + id + " not found");
         }
     }

@@ -13,9 +13,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 
+@Slf4j
 @WebServlet(name = "teacherServlet", value = "/teachers/*")
 public class TeacherServlet extends HttpServlet {
 
@@ -28,16 +30,25 @@ public class TeacherServlet extends HttpServlet {
         ServletContext servletContext = config.getServletContext();
         this.teacherService = (TeacherService) servletContext.getAttribute("teacherService");
         this.jsonService = (JsonService) servletContext.getAttribute("jsonService");
+        log.info("TeacherServlet initialized with TeacherService and JsonService");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        var result = teacherService.getAllTeachers();
+        try {
+            var result = teacherService.getAllTeachers();
 
-        resp.setContentType("application/json");
-        PrintWriter out = resp.getWriter();
-        out.print(jsonService.toJson(result));
-        out.flush();
+            resp.setContentType("application/json");
+            PrintWriter out = resp.getWriter();
+            out.print(jsonService.toJson(result));
+            out.flush();
+
+            log.info("GET request processed. Result: {}", result);
+        } catch (Exception e) {
+            log.error("Error processing GET request: {}", e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("Error processing request");
+        }
     }
 
     @Override
@@ -48,13 +59,17 @@ public class TeacherServlet extends HttpServlet {
             teacherDTO.validate();
             teacherService.addTeacher(teacherDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
+            log.info("POST request processed. Teacher added: {}", teacherDTO);
         } catch (TeacherAlreadyExistsException e) {
+            log.error("Teacher already exists: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
             resp.getWriter().write("Teacher already exists: " + e.getMessage());
         } catch (IllegalArgumentException e) {
+            log.error("Invalid input: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Invalid input: " + e.getMessage());
         } catch (Exception e) {
+            log.error("Unexpected error: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("An unexpected error occurred: " + e.getMessage());
         }
@@ -71,10 +86,13 @@ public class TeacherServlet extends HttpServlet {
 
             teacherService.addSubjectToTeacher(teacherId, subjectDTO);
             resp.setStatus(HttpServletResponse.SC_OK);
+            log.info("PUT request processed. Subject added to teacher id {}: {}", teacherId, subjectDTO);
         } catch (TeacherNotFoundException e) {
+            log.error("Teacher not found: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write(e.getMessage());
         } catch (Exception e) {
+            log.error("Failed to add subject: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Failed to add subject: " + e.getMessage());
         }

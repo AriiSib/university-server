@@ -13,6 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 
 import static com.khokhlov.universityserver.consts.Consts.*;
 
+@Slf4j
 @WebServlet(name = "TimetableServlet", value = "/timetable/*")
 public class TimetableServlet extends HttpServlet {
     private TimetableService timetableService;
@@ -36,16 +38,25 @@ public class TimetableServlet extends HttpServlet {
         this.timetableService = (TimetableService) context.getAttribute(TIMETABLE_SERVICE);
         this.propertyService = (PropertyService) context.getAttribute(PROPERTY_SERVICE);
         this.jsonService = (JsonService) context.getAttribute(JSON_SERVICE);
+        log.info("TimetableServlet initialized.");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        var result = getPathInfo(req, resp);
+        try {
+            var result = getPathInfo(req, resp);
 
-        resp.setContentType("application/json");
-        PrintWriter out = resp.getWriter();
-        out.print(jsonService.toJson(result));
-        out.flush();
+            resp.setContentType("application/json");
+            PrintWriter out = resp.getWriter();
+            out.print(jsonService.toJson(result));
+            out.flush();
+
+            log.info("GET request processed. Result: {}", result);
+        } catch (Exception e) {
+            log.error("Error processing GET request: {}", e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("Error processing request");
+        }
     }
 
     @Override
@@ -56,7 +67,9 @@ public class TimetableServlet extends HttpServlet {
             Validator.validateTimetable(timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime(), propertyService);
             timetableService.addTimetable(timetableDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
+            log.info("Timetable added successfully.");
         } catch (Exception e) {
+            log.error("Error adding timetable: {}", e.getMessage());
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
             resp.getWriter().write(e.getMessage());
         }
@@ -73,7 +86,9 @@ public class TimetableServlet extends HttpServlet {
             Validator.validateTimetable(timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime(), propertyService);
             timetableService.updateTimetable(date, timetableDTO);
             resp.setStatus(HttpServletResponse.SC_OK);
+            log.info("Timetable updated successfully.");
         } catch (Exception e) {
+            log.error("Error updating timetable: {}", e.getMessage());
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
             resp.getWriter().write(e.getMessage());
         }
@@ -101,13 +116,17 @@ public class TimetableServlet extends HttpServlet {
                 result = timetableService.getAllTimetables();
             }
             resp.setStatus(HttpServletResponse.SC_OK);
+            log.info("Timetables retrieved successfully.");
         } catch (NumberFormatException e) {
+            log.error("Invalid group number format: {}", e.getMessage());
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Invalid group number format: " + e.getMessage());
         } catch (TimetableNotFoundException e) {
+            log.error("Timetable not found: {}", e.getMessage());
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write("Timetable not found: " + e.getMessage());
         } catch (Exception e) {
+            log.error("Error retrieving timetable: {}", e.getMessage());
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("An error occurred while retrieving the timetable: " + e.getMessage());
         }

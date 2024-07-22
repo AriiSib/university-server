@@ -12,12 +12,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 
 import static com.khokhlov.universityserver.consts.Consts.*;
 
-
+@Slf4j
 @WebServlet(name = "studentService", value = "/students/*")
 public class StudentServlet extends HttpServlet {
 
@@ -30,16 +31,25 @@ public class StudentServlet extends HttpServlet {
         ServletContext context = config.getServletContext();
         this.studentService = (StudentService) context.getAttribute(STUDENT_SERVICE);
         this.jsonService = (JsonService) context.getAttribute(JSON_SERVICE);
+        log.info("StudentServlet initialized");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Object result = getPathInfo(req);
+        try {
+            Object result = getPathInfo(req);
 
-        resp.setContentType("application/json");
-        PrintWriter out = resp.getWriter();
-        out.print(jsonService.toJson(result));
-        out.flush();
+            resp.setContentType("application/json");
+            PrintWriter out = resp.getWriter();
+            out.print(jsonService.toJson(result));
+            out.flush();
+
+            log.info("GET request processed. Result: {}", result);
+        } catch (Exception e) {
+            log.error("Error processing GET request: {}", e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("Error processing request");
+        }
     }
 
 
@@ -51,13 +61,17 @@ public class StudentServlet extends HttpServlet {
             studentDTO.validate();
             studentService.addStudent(studentDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
+            log.info("POST request processed. Student added: {}", studentDTO);
         } catch (StudentAlreadyExistsException e) {
+            log.error("Student already exists: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
             resp.getWriter().write(e.getMessage());
         } catch (IllegalArgumentException e) {
+            log.error("Invalid input: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Invalid input: " + e.getMessage());
         } catch (Exception e) {
+            log.error("Unexpected error: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("An unexpected error occurred: " + e.getMessage());
         }
@@ -76,10 +90,13 @@ public class StudentServlet extends HttpServlet {
 
             studentService.updateStudent(studentId, studentDTO);
             resp.setStatus(HttpServletResponse.SC_OK);
+            log.info("PUT request processed. Student updated: {}", studentDTO);
         } catch (StudentNotFoundException e) {
+            log.error("Student not found: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write(e.getMessage());
         } catch (Exception e) {
+            log.error("Failed to update student: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Failed to update student: " + e.getMessage());
         }
@@ -92,7 +109,9 @@ public class StudentServlet extends HttpServlet {
             long id = Long.parseLong(pathInfo.substring(1));
             studentService.deleteStudent(id);
             resp.setStatus(HttpServletResponse.SC_OK);
+            log.info("DELETE request processed. Student with id {} deleted", id);
         } catch (StudentNotFoundException e) {
+            log.error("Student not found: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write(e.getMessage());
         }
@@ -109,16 +128,22 @@ public class StudentServlet extends HttpServlet {
             if (pathPart.length == 1 && pathPart[0].matches("\\d+")) {
                 long id = Integer.parseInt(pathPart[0]);
                 result = studentService.getStudentById(id);
+                log.debug("getPathInfo: Retrieved student by id {}", id);
             }
         } else if (name != null && surname != null) {
             result = studentService.getStudentsByNameAndSurname(name, surname);
+            log.debug("getPathInfo: Retrieved students by name {} and surname {}", name, surname);
         } else if (name != null) {
             result = studentService.getStudentsByName(name);
+            log.debug("getPathInfo: Retrieved students by name {}", name);
         } else if (surname != null) {
             result = studentService.getStudentsBySurname(surname);
+            log.debug("getPathInfo: Retrieved students by surname {}", surname);
         } else {
             result = studentService.getAllStudents();
+            log.debug("getPathInfo: Retrieved all students");
         }
+
         return result;
     }
 

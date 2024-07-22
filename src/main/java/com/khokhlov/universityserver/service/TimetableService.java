@@ -5,6 +5,7 @@ import com.khokhlov.universityserver.exception.TimetableNotFoundException;
 import com.khokhlov.universityserver.model.Timetable;
 import com.khokhlov.universityserver.model.data.MemoryDB;
 import com.khokhlov.universityserver.model.dto.TimetableDTO;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class TimetableService {
     private final MemoryDB DB;
     private final MappingService mappingService;
@@ -35,18 +37,29 @@ public class TimetableService {
     }
 
     public Collection<Timetable> getAllTimetables() {
-        return DB.getTimetables().values();
+        Collection<Timetable> timetables = DB.getTimetables().values();
+        log.info("Retrieved {} timetables", timetables.size());
+        return timetables;
     }
 
     public Optional<Timetable> getTimetablesByGroupNumber(long groupNumber) {
         if (DB.getGroups().values().stream().noneMatch(group -> group.getNumber() == groupNumber)) {
+            log.error("Group not found for the given timetable: group number {}", groupNumber);
             throw new TimetableNotFoundException("Group not found for the given timetable ");
         }
 
-        return DB.getTimetables().values().stream()
-                .filter(timetable -> DB.getGroups().containsKey(timetable.getGroupId()) &&
-                        DB.getGroups().get(timetable.getGroupId()).getNumber() == groupNumber)
+        Optional<Timetable> timetable = DB.getTimetables().values().stream()
+                .filter(t -> DB.getGroups().containsKey(t.getGroupId()) &&
+                        DB.getGroups().get(t.getGroupId()).getNumber() == groupNumber)
                 .findFirst();
+
+        if (timetable.isPresent()) {
+            log.info("Found timetable for group number {}: {}", groupNumber, timetable.get());
+        } else {
+            log.warn("No timetable found for group number {}", groupNumber);
+        }
+
+        return timetable;
     }
 
     public List<Timetable> getTimetablesByStudentSurname(String studentSurname) {
@@ -57,9 +70,11 @@ public class TimetableService {
                 .collect(Collectors.toList());
 
         if (timetables.isEmpty()) {
+            log.warn("No timetables found for student surname {}", studentSurname);
             throw new TimetableNotFoundException("No timetables found for the given student surname ");
         }
 
+        log.info("Found {} timetables for student surname {}", timetables.size(), studentSurname);
         return timetables;
     }
 
@@ -70,9 +85,11 @@ public class TimetableService {
                 .collect(Collectors.toList());
 
         if (timetables.isEmpty()) {
+            log.warn("No timetables found for teacher surname {}", teacherSurname);
             throw new TimetableNotFoundException("No timetables found for the given teacher surname ");
         }
 
+        log.info("Found {} timetables for teacher surname {}", timetables.size(), teacherSurname);
         return timetables;
     }
 
@@ -82,9 +99,11 @@ public class TimetableService {
                 .collect(Collectors.toList());
 
         if (timetables.isEmpty()) {
+            log.warn("No timetables found for date {}", date);
             throw new TimetableNotFoundException("No timetables found for the given date ");
         }
 
+        log.info("Found {} timetables for date {}", timetables.size(), date);
         return timetables;
     }
 
@@ -93,10 +112,13 @@ public class TimetableService {
         if (!DB.getTimetables().containsValue(newTimetable)) {
             if (isScheduleValid(newTimetable, newTimetable.getTeacherId())) {
                 DB.getTimetables().put(idGenerator.getAndIncrement(), newTimetable);
+                log.info("Added new timetable: {}", newTimetable);
             } else {
+                log.error("The total number of classes for the day exceeds the limit of {}", propertyService.getMaxClassesTime());
                 throw new IllegalArgumentException("The total number of classes for the day exceeds the limit of " + propertyService.getMaxClassesTime());
             }
         } else {
+            log.warn("Attempt to add existing timetable: {}", newTimetable);
             throw new TimetableAlreadyExistsException("Timetable already exists");
         }
     }
@@ -106,6 +128,7 @@ public class TimetableService {
         List<Timetable> timetables = getTimetablesByDate(date);
 
         if (timetables.isEmpty()) {
+            log.error("Timetable not found for the given date: {}", date);
             throw new TimetableNotFoundException("Timetable not found for the given date");
         }
 
@@ -117,9 +140,12 @@ public class TimetableService {
         timetable.setEndDateTime(updatedTimetable.getEndDateTime());
 
         if (!isScheduleValid(timetable, timetable.getTeacherId())) {
+            log.error("The total number of classes for the day exceeds the limit of {}", propertyService.getMaxClassesTime());
             throw new IllegalArgumentException("The total number of classes for the day exceeds the limit of "
                     + propertyService.getMaxClassesTime());
         }
+
+        log.info("Updated timetable: {}", timetable);
     }
 
     private boolean isScheduleValid(Timetable newTimetable, long teacherId) {
