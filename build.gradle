@@ -5,7 +5,10 @@ plugins {
 }
 
 group 'com.khokhlov'
-version '1.0-SNAPSHOT'
+
+war {
+    archiveBaseName = 'university_server'
+}
 
 repositories {
     mavenCentral()
