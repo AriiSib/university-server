@@ -65,5 +65,4 @@ public class TeacherService {
             throw new TeacherNotFoundException("Teacher with id " + teacherId + " not found");
         }
     }
-
 }

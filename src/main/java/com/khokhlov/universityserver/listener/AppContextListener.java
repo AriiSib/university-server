@@ -32,7 +32,7 @@ public class AppContextListener implements ServletContextListener {
 
         objectMapper.registerModule(new Jdk8Module());
         JavaTimeModule module = new JavaTimeModule();
-        module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DATE_TIME)));
         module.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
         objectMapper.registerModule(module);
 

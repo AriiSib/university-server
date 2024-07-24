@@ -67,7 +67,7 @@ public class GroupService {
             log.error("Group must have at least {} students, but {} were provided.", minStudents, studentCount);
             throw new IllegalArgumentException("Group must have at least " + minStudents + " students.");
         } else if (studentCount > maxStudents) {
-            log.error("Group cannot have more than {} students, but {} were provided.", maxStudents, studentCount);
+            log.error("Group cannot have more than {} students (see config.properties), but {} were provided.", maxStudents, studentCount);
             throw new IllegalArgumentException("Group cannot have more than " + maxStudents + " students.");
         }
 
