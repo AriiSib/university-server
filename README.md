@@ -3,20 +3,60 @@
 
 # University Server
 
-## Description
+University Server is a RESTful CRUD application designed to manage information about students, teachers, groups, and
+schedules. It provides an intuitive API for performing various operations related to a university's database, making it
+easy to manage and access academic information.
 
-**University Server** is a REST web application built using the Java Servlet API, which serves as a backend component
-for managing student data, groups, and schedules in a university system. The project includes the use of JSP, JSTL, and
-Servlets.
+## Application Features
 
-## Features
+### Student Management
 
-- Manage student data, groups, and schedules via REST API, for example, using Postman.
-- Use JUnit and Mockito for testing application logic.
-- Logging with Logback and SLF4J.
-- Integration with Docker for easy deployment.
-- Continuous integration with [GitHub Actions](https://github.com/AriiSib/university-server/actions)
-  and [Codecov](https://app.codecov.io/gh/ariiSib/university-server) for code coverage tracking.
+- **Add Students**: Create new student records with details such as name, surname, birthdate, and phone number.
+- **Edit Students**: Update existing student information.
+- **Delete Students**: Remove student records from the database.
+- **Get All Students**: Retrieve a list of all students.
+- **Search Students**:
+    - By **surname**: Find students by their last name.
+    - By **name**: Search for students by their first name.
+    - By **name & surname**: Search for students by their first name and surname.
+    - By **ID**: Access specific student details using their unique ID.
+
+### Teacher Management
+
+- **Add Teachers**: Create new teacher profiles, specifying their name and subject(s) taught.
+- **Assign Subjects**: Add subjects taught by teachers.
+- **Get All Teachers**: Retrieve a list of all teachers.
+
+### Group Management
+
+- **Create Groups**: Form groups by specifying the group number, teacher ID, and student IDs.
+- **Add Student to Groups**: Add student to group.
+- **Get All Groups**: Retrieve a list of all groups.
+- **Get Groups**:
+    - By **student surname**: Retrieve groups containing students with a specific surname.
+    - By **group number**: Access group information using the group number.
+    - By **group number & surname**: Access group information using the group number and student surname.
+
+### Schedule Management
+
+- **Create Schedules**: Set up schedules by assigning a group ID, teacher ID, and specifying start and end times for
+  classes.
+- **Edit Schedules**: Modify existing schedules based on the date.
+- **Get All Schedules**: Retrieve a list of all schedules.
+- **Get Schedules**:
+    - By **group number**: Retrieve schedules for a specific group.
+    - By **student surname**: Access schedules for students with a specific surname.
+    - By **teacher surname**: Get schedules for classes taught by a particular teacher.
+    - By **date**: Find schedules based on specific dates.
+
+## Technical  Features
+
+- **Testing**: Use JUnit and Mockito for testing application logic.
+- **Logging**: Logging with Logback and SLF4J.
+- **Deployment**: Integration with Docker for easy deployment.
+- **Continuous integration**:
+    - Automated testing and building with [GitHub Actions](https://github.com/AriiSib/university-server/actions)
+    - Code coverage tracking with  [Codecov](https://app.codecov.io/gh/ariiSib/university-server)
 
 ## Stack
 
