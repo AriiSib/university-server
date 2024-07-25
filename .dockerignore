@@ -2,13 +2,20 @@ build/
 !build/libs/
 .gradle/
 out/
+test/
+src/
 .cache/
 logs/
+university-server.iml
+University REST Application.postman_collection.json
+
 
 *.iml
 .idea/
 .vscode/
+.github
 
+*.java
 *.log
 *.tmp
 *.class
@@ -17,8 +24,10 @@ Thumbs.db
 
 *.env
 
-.git
+*.git/
 .gitignore
 .gitattributes
+.md
+.travis.yml
 
 .dockerignore

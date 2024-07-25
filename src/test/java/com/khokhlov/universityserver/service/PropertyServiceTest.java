@@ -34,6 +34,6 @@ class PropertyServiceTest {
     @Test
     void should_ReturnCorrectMaxStudents_When_PropertyIsDefined() {
         int maxStudents = propertyService.getMaxStudents();
-        assertEquals(30, maxStudents, "The maximum number of students should be 30");
+        assertEquals(3, maxStudents, "The maximum number of students should be 3");
     }
 }

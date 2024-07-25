@@ -5,9 +5,10 @@ plugins {
 }
 
 group 'com.khokhlov'
+version '1.0.0'
 
 war {
-    archiveBaseName = 'university_server'
+    archiveBaseName = 'university-server'
 }
 
 repositories {
