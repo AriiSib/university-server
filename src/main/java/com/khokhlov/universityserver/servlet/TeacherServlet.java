@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 
+import static com.khokhlov.universityserver.utils.HttpRequestUtils.getBody;
+
 @Slf4j
 @WebServlet(name = "teacherServlet", value = "/teachers/*")
 public class TeacherServlet extends HttpServlet {
@@ -44,6 +46,7 @@ public class TeacherServlet extends HttpServlet {
             out.flush();
 
             log.info("GET request processed. Result: {}", result);
+            resp.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
             log.error("Error processing GET request: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -98,16 +101,4 @@ public class TeacherServlet extends HttpServlet {
         }
     }
 
-
-    private static String getBody(HttpServletRequest request) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
-            char[] charBuffer = new char[128];
-            int bytesRead;
-            while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                stringBuilder.append(charBuffer, 0, bytesRead);
-            }
-        }
-        return stringBuilder.toString();
-    }
 }

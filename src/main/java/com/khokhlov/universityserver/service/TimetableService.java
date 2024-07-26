@@ -7,7 +7,9 @@ import com.khokhlov.universityserver.model.data.MemoryDB;
 import com.khokhlov.universityserver.model.dto.TimetableDTO;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -109,13 +111,20 @@ public class TimetableService {
 
     public void addTimetable(TimetableDTO timetableDTO) {
         Timetable newTimetable = mappingService.fromTimetableDTO(idGenerator.get(), timetableDTO);
+
+        if (!isDurationValid(newTimetable.getStartDateTime(), newTimetable.getEndDateTime())) {
+            log.error("The duration of the timetable must be 90 minutes.");
+            throw new IllegalArgumentException("The duration of the timetable must be 90 minutes.");
+        }
+
         if (!DB.getTimetables().containsValue(newTimetable)) {
-            if (isScheduleValid(newTimetable, newTimetable.getTeacherId())) {
+            if (!isTimeLimitExceeded(newTimetable.getGroupId(), newTimetable.getStartDateTime(), newTimetable.getEndDateTime(), true) ||
+                    !isTimeLimitExceeded(newTimetable.getTeacherId(), newTimetable.getStartDateTime(), newTimetable.getEndDateTime(), false)) {
                 DB.getTimetables().put(idGenerator.getAndIncrement(), newTimetable);
                 log.info("Added new timetable: {}", newTimetable);
             } else {
-                log.error("The total number of classes for the day exceeds the limit of {}", propertyService.getMaxClassesTime());
-                throw new IllegalArgumentException("The total number of classes for the day exceeds the limit of " + propertyService.getMaxClassesTime());
+                log.error("The total duration for the group or teacher exceeds the limit.");
+                throw new IllegalArgumentException("The total duration for the group or teacher exceeds the limit.");
             }
         } else {
             log.warn("Attempt to add existing timetable: {}", newTimetable);
@@ -123,39 +132,54 @@ public class TimetableService {
         }
     }
 
-    public void updateTimetable(LocalDate date, TimetableDTO updatedTimetableDTO) {
-        Timetable updatedTimetable = mappingService.fromTimetableDTO(updatedTimetableDTO);
-        List<Timetable> timetables = getTimetablesByDate(date);
 
-        if (timetables.isEmpty()) {
-            log.error("Timetable not found for the given date: {}", date);
-            throw new TimetableNotFoundException("Timetable not found for the given date");
+    public void updateTimetable(LocalDate date, TimetableDTO timetableDTO) {
+        Optional<Timetable> existingTimetableOpt = DB.getTimetables().values().stream()
+                .filter(t -> t.getGroupId() == timetableDTO.getGroupId() &&
+                        t.getTeacherId() == timetableDTO.getTeacherId() &&
+                        t.getStartDateTime().toLocalDate().equals(date))
+                .findFirst();
+
+        if (existingTimetableOpt.isPresent()) {
+            Timetable existingTimetable = existingTimetableOpt.get();
+
+            if (!isDurationValid(timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime())) {
+                log.error("The duration of the timetable must be 90 minutes.");
+                throw new IllegalArgumentException("The duration of the timetable must be 90 minutes.");
+            }
+
+            if (isTimeLimitExceeded(timetableDTO.getGroupId(), timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime(), true)) {
+                throw new IllegalArgumentException("Exceeds group time limit");
+            }
+
+            if (isTimeLimitExceeded(timetableDTO.getTeacherId(), timetableDTO.getStartDateTime(), timetableDTO.getEndDateTime(), false)) {
+                throw new IllegalArgumentException("Exceeds teacher time limit");
+            }
+
+            existingTimetable.setStartDateTime(timetableDTO.getStartDateTime());
+            existingTimetable.setEndDateTime(timetableDTO.getEndDateTime());
+        } else {
+            throw new TimetableNotFoundException("Timetable not found for the given date, group, and teacher");
         }
-
-        Timetable timetable = timetables.get(0);
-
-        timetable.setGroupId(updatedTimetable.getGroupId());
-        timetable.setTeacherId(updatedTimetable.getTeacherId());
-        timetable.setStartDateTime(updatedTimetable.getStartDateTime());
-        timetable.setEndDateTime(updatedTimetable.getEndDateTime());
-
-        if (!isScheduleValid(timetable, timetable.getTeacherId())) {
-            log.error("The total number of classes for the day exceeds the limit of {}", propertyService.getMaxClassesTime());
-            throw new IllegalArgumentException("The total number of classes for the day exceeds the limit of "
-                    + propertyService.getMaxClassesTime());
-        }
-
-        log.info("Updated timetable: {}", timetable);
     }
 
-    private boolean isScheduleValid(Timetable newTimetable, long teacherId) {
-        LocalDate date = newTimetable.getStartDateTime().toLocalDate();
-        long totalClasses = DB.getTimetables().values().stream()
-                .filter(timetable -> timetable.getStartDateTime().toLocalDate().equals(date)
-                        && timetable.getTeacherId() == teacherId)
-                .count();
 
-        totalClasses += 1;
-        return totalClasses <= propertyService.getMaxClassesTime();
+    private boolean isTimeLimitExceeded(Long entityId, LocalDateTime newStartDateTime, LocalDateTime newEndDateTime, boolean isGroup) {
+        LocalDate date = newStartDateTime.toLocalDate();
+        long totalMinutes = DB.getTimetables().values().stream()
+                .filter(t -> (isGroup ? t.getGroupId() : t.getTeacherId()) == entityId &&
+                        t.getStartDateTime().toLocalDate().equals(date))
+                .mapToLong(t -> Duration.between(t.getStartDateTime(), t.getEndDateTime()).toMinutes())
+                .sum();
+
+        totalMinutes += Duration.between(newStartDateTime, newEndDateTime).toMinutes();
+
+        return totalMinutes > propertyService.getMaxClassesTime();
     }
+
+    private boolean isDurationValid(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        long durationInMinutes = Duration.between(startDateTime, endDateTime).toMinutes();
+        return durationInMinutes == 90;
+    }
+
 }

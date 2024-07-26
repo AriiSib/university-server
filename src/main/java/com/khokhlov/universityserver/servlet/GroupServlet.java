@@ -1,5 +1,6 @@
 package com.khokhlov.universityserver.servlet;
 
+import com.khokhlov.universityserver.exception.GroupNotFoundException;
 import com.khokhlov.universityserver.model.Student;
 import com.khokhlov.universityserver.model.dto.GroupDTO;
 import com.khokhlov.universityserver.service.GroupService;
@@ -17,6 +18,7 @@ import java.io.*;
 import java.util.List;
 
 import static com.khokhlov.universityserver.consts.Consts.*;
+import static com.khokhlov.universityserver.utils.HttpRequestUtils.getBody;
 
 @Slf4j
 @WebServlet(name = "GroupServlet", value = "/groups/*")
@@ -37,7 +39,7 @@ public class GroupServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            Object result = getPathInfo(req);
+            Object result = getPathInfo(req, resp);
 
             resp.setContentType("application/json");
             PrintWriter out = resp.getWriter();
@@ -45,6 +47,10 @@ public class GroupServlet extends HttpServlet {
             out.flush();
 
             log.info("GET request processed. Result: {}", result);
+        } catch (GroupNotFoundException e) {
+            log.error("Error processing GET request: {}", e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().write("Group not found");
         } catch (Exception e) {
             log.error("Error processing GET request: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -101,39 +107,39 @@ public class GroupServlet extends HttpServlet {
         }
     }
 
-    private Object getPathInfo(HttpServletRequest req) throws IOException {
+    private Object getPathInfo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String groupNumber = req.getParameter("number");
         String surname = req.getParameter(SURNAME);
 
         Object result = null;
 
-        if (groupNumber != null && surname != null) {
-            result = groupService.getGroupByNumberAndSurname(groupNumber, surname);
-            log.debug("getPathInfo: Retrieved group by number {} and surname {}", groupNumber, surname);
-        } else if (groupNumber != null) {
-            result = groupService.getGroupByNumber(groupNumber);
-            log.debug("getPathInfo: Retrieved group by number {}", groupNumber);
-        } else if (surname != null) {
-            result = groupService.getGroupBySurname(surname);
-            log.debug("getPathInfo: Retrieved group by surname {}", surname);
-        } else {
-            result = groupService.getAllGroups();
-            log.debug("getPathInfo: Retrieved all groups");
+        try {
+            if (groupNumber != null && surname != null) {
+                result = groupService.getGroupByNumberAndSurname(groupNumber, surname);
+                log.debug("getPathInfo: Retrieved group by number {} and surname {}", groupNumber, surname);
+            } else if (groupNumber != null) {
+                result = groupService.getGroupByNumber(groupNumber);
+                log.debug("getPathInfo: Retrieved group by number {}", groupNumber);
+            } else if (surname != null) {
+                result = groupService.getGroupBySurname(surname);
+                log.debug("getPathInfo: Retrieved group by surname {}", surname);
+            } else {
+                result = groupService.getAllGroups();
+                log.debug("getPathInfo: Retrieved all groups");
+            }
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (NumberFormatException e) {
+            log.error("Invalid number format: {}", e.getMessage(), e);
+            throw new IllegalArgumentException("Invalid number format", e);
+        } catch (GroupNotFoundException e) {
+            log.error("Group not found: {}", e.getMessage(), e);
+            throw new GroupNotFoundException("Group not found");
+        } catch (Exception e) {
+            log.error("Error retrieving group information: {}", e.getMessage(), e);
+            throw new RuntimeException("Error retrieving group information", e);
         }
 
         return result;
     }
 
-
-    private static String getBody(HttpServletRequest request) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
-            char[] charBuffer = new char[128];
-            int bytesRead;
-            while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                stringBuilder.append(charBuffer, 0, bytesRead);
-            }
-        }
-        return stringBuilder.toString();
-    }
 }

@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.*;
 
 import static com.khokhlov.universityserver.consts.Consts.*;
+import static com.khokhlov.universityserver.utils.HttpRequestUtils.getBody;
 
 @Slf4j
 @WebServlet(name = "studentService", value = "/students/*")
@@ -37,7 +38,7 @@ public class StudentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            Object result = getPathInfo(req);
+            Object result = getPathInfo(req, resp);
 
             resp.setContentType("application/json");
             PrintWriter out = resp.getWriter();
@@ -45,6 +46,14 @@ public class StudentServlet extends HttpServlet {
             out.flush();
 
             log.info("GET request processed. Result: {}", result);
+        } catch (StudentNotFoundException e) {
+            log.info("Student not found: {}", e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().write("Student not found");
+        } catch (NumberFormatException e) {
+            log.info("Number format exception: {}", e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("Number format exception");
         } catch (Exception e) {
             log.error("Error processing GET request: {}", e.getMessage(), e);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -117,45 +126,46 @@ public class StudentServlet extends HttpServlet {
         }
     }
 
-    private Object getPathInfo(HttpServletRequest req) throws IOException {
+    private Object getPathInfo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();
         String name = req.getParameter(NAME);
         String surname = req.getParameter(SURNAME);
         Object result = null;
 
-        if (pathInfo != null && pathInfo.startsWith("/")) {
-            String[] pathPart = pathInfo.substring(1).split("/");
-            if (pathPart.length == 1 && pathPart[0].matches("\\d+")) {
-                long id = Integer.parseInt(pathPart[0]);
-                result = studentService.getStudentById(id);
-                log.debug("getPathInfo: Retrieved student by id {}", id);
+        try {
+            if (pathInfo != null && pathInfo.startsWith("/")) {
+                String[] pathPart = pathInfo.substring(1).split("/");
+                if (pathPart.length == 1 && pathPart[0].matches("\\d+")) {
+                    long id = Integer.parseInt(pathPart[0]);
+                    result = studentService.getStudentById(id);
+                    log.debug("getPathInfo: Retrieved student by id {}", id);
+                }
+            } else if (name != null && surname != null) {
+                result = studentService.getStudentsByNameAndSurname(name, surname);
+                log.debug("getPathInfo: Retrieved students by name {} and surname {}", name, surname);
+            } else if (name != null) {
+                result = studentService.getStudentsByName(name);
+                log.debug("getPathInfo: Retrieved students by name {}", name);
+            } else if (surname != null) {
+                result = studentService.getStudentsBySurname(surname);
+                log.debug("getPathInfo: Retrieved students by surname {}", surname);
+            } else {
+                result = studentService.getAllStudents();
+                log.debug("getPathInfo: Retrieved all students");
             }
-        } else if (name != null && surname != null) {
-            result = studentService.getStudentsByNameAndSurname(name, surname);
-            log.debug("getPathInfo: Retrieved students by name {} and surname {}", name, surname);
-        } else if (name != null) {
-            result = studentService.getStudentsByName(name);
-            log.debug("getPathInfo: Retrieved students by name {}", name);
-        } else if (surname != null) {
-            result = studentService.getStudentsBySurname(surname);
-            log.debug("getPathInfo: Retrieved students by surname {}", surname);
-        } else {
-            result = studentService.getAllStudents();
-            log.debug("getPathInfo: Retrieved all students");
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (StudentNotFoundException e) {
+            log.error("Student not found: {}", e.getMessage());
+            throw new StudentNotFoundException("Student not found");
+        } catch (NumberFormatException e) {
+            log.error("Invalid student ID format: {}", e.getMessage());
+            throw new NumberFormatException("Invalid student ID format");
+        } catch (Exception e) {
+            log.error("Error occurred while retrieving student: {}", e.getMessage());
+            throw new IOException("Error occurred while retrieving student", e);
         }
 
         return result;
     }
 
-    private static String getBody(HttpServletRequest request) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
-            char[] charBuffer = new char[128];
-            int bytesRead;
-            while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                stringBuilder.append(charBuffer, 0, bytesRead);
-            }
-        }
-        return stringBuilder.toString();
-    }
 }

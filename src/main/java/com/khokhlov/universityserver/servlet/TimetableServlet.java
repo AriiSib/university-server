@@ -15,14 +15,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import static com.khokhlov.universityserver.consts.Consts.*;
+import static com.khokhlov.universityserver.utils.HttpRequestUtils.getBody;
 
 @Slf4j
 @WebServlet(name = "TimetableServlet", value = "/timetable/*")
@@ -134,15 +133,4 @@ public class TimetableServlet extends HttpServlet {
         return result;
     }
 
-    private static String getBody(HttpServletRequest request) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
-            char[] charBuffer = new char[128];
-            int bytesRead;
-            while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                stringBuilder.append(charBuffer, 0, bytesRead);
-            }
-        }
-        return stringBuilder.toString();
-    }
 }

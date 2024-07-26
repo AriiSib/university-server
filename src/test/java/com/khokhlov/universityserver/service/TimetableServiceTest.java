@@ -23,6 +23,10 @@ import static org.mockito.Mockito.when;
 
 class TimetableServiceTest {
 
+    private static final LocalDateTime FIXED_START_TIME = LocalDateTime.of(2024, 7, 25, 10, 0);
+    private static final LocalDateTime FIXED_END_TIME = FIXED_START_TIME.plusHours(1).plusMinutes(30);
+
+
     private MemoryDB memoryDB;
     private MappingService mappingService;
     private PropertyService propertyService;
@@ -44,15 +48,15 @@ class TimetableServiceTest {
         teacher = new Teacher(1L, "Jane", "Smith", 5L, new ArrayList<>());
         student = new Student(1L, "John", "Doe", LocalDate.of(2000, 1, 1), "+7 (123) 456-78-90");
         group = new Group(1L, 101L, Arrays.asList(student));
-        timetable = new Timetable(1L, 1L, 1L, LocalDateTime.now(), LocalDateTime.now().plusHours(2));
-        timetableDTO = new TimetableDTO(1L, 1L, LocalDateTime.now(), LocalDateTime.now().plusHours(2));
+        timetable = new Timetable(1L, 1L, 1L, FIXED_START_TIME, FIXED_END_TIME);
+        timetableDTO = new TimetableDTO(1L, 1L, FIXED_START_TIME, FIXED_END_TIME);
 
         memoryDB.getTeachers().put(1L, teacher);
         memoryDB.getGroups().put(1L, group);
 
         when(mappingService.fromTimetableDTO(anyLong(), eq(timetableDTO))).thenReturn(timetable);
         when(mappingService.fromTimetableDTO(timetableDTO)).thenReturn(timetable);
-        when(propertyService.getMaxClassesTime()).thenReturn(5);
+        when(propertyService.getMaxClassesTime()).thenReturn(450);
     }
 
     @Test
@@ -69,6 +73,16 @@ class TimetableServiceTest {
 
         assertThrows(TimetableAlreadyExistsException.class, () -> timetableService.addTimetable(timetableDTO));
     }
+
+    @Test
+    void should_ThrowException_When_AddingTimetableWithInvalidDuration() {
+        TimetableDTO invalidTimetableDTO = new TimetableDTO(1L, 1L, FIXED_START_TIME, FIXED_END_TIME);
+        timetable.setEndDateTime(FIXED_END_TIME.plusMinutes(89));
+        when(mappingService.fromTimetableDTO(anyLong(), eq(timetableDTO))).thenReturn(timetable);
+        IllegalArgumentException thrownException = assertThrows(IllegalArgumentException.class, () -> timetableService.addTimetable(invalidTimetableDTO));
+        assertEquals("The duration of the timetable must be 90 minutes.", thrownException.getMessage());
+    }
+
 
     @Test
     void should_GetAllTimetables() {
@@ -129,7 +143,7 @@ class TimetableServiceTest {
     void should_GetTimetablesByDate_When_TimetableExists() {
         memoryDB.getTimetables().put(1L, timetable);
 
-        List<Timetable> timetables = timetableService.getTimetablesByDate(LocalDate.now());
+        List<Timetable> timetables = timetableService.getTimetablesByDate(FIXED_START_TIME.toLocalDate());
 
         assertEquals(1, timetables.size());
         assertTrue(timetables.contains(timetable));
@@ -143,16 +157,13 @@ class TimetableServiceTest {
     @Test
     void should_UpdateTimetable_When_TimetableExists() {
         memoryDB.getTimetables().put(1L, timetable);
-        TimetableDTO updatedTimetableDTO = new TimetableDTO(1L, 1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(2));
-        Timetable updatedTimetable = new Timetable(1L, 1L, 1L, updatedTimetableDTO.getStartDateTime(), updatedTimetableDTO.getEndDateTime());
-
-        when(mappingService.fromTimetableDTO(eq(updatedTimetableDTO))).thenReturn(updatedTimetable);
-
-        timetableService.updateTimetable(LocalDate.now(), updatedTimetableDTO);
+        timetableDTO.setStartDateTime(FIXED_START_TIME.plusMinutes(60));
+        timetableDTO.setEndDateTime(FIXED_END_TIME.plusMinutes(60));
+        timetableService.updateTimetable(FIXED_START_TIME.toLocalDate(), timetableDTO);
 
         Timetable result = memoryDB.getTimetables().get(1L);
-        assertEquals(updatedTimetableDTO.getStartDateTime(), result.getStartDateTime());
-        assertEquals(updatedTimetableDTO.getEndDateTime(), result.getEndDateTime());
+        assertEquals(timetableDTO.getStartDateTime(), result.getStartDateTime());
+        assertEquals(timetableDTO.getEndDateTime(), result.getEndDateTime());
     }
 
     @Test
@@ -165,13 +176,9 @@ class TimetableServiceTest {
     @Test
     void should_ThrowException_When_UpdatingTimetableWithExceedingClasses() {
         memoryDB.getTimetables().put(1L, timetable);
-        TimetableDTO updatedTimetableDTO = new TimetableDTO(1L, 1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(2));
-        Timetable updatedTimetable = new Timetable(1L, 1L, 1L, updatedTimetableDTO.getStartDateTime(), updatedTimetableDTO.getEndDateTime());
+        TimetableDTO updatedTimetableDTO = new TimetableDTO(1L, 1L, FIXED_START_TIME.plusHours(1), FIXED_END_TIME.plusHours(12));
 
-        when(propertyService.getMaxClassesTime()).thenReturn(1); // Exceed the limit
-        when(mappingService.fromTimetableDTO(eq(updatedTimetableDTO))).thenReturn(updatedTimetable);
-
-        assertThrows(IllegalArgumentException.class, () -> timetableService.updateTimetable(LocalDate.now(), updatedTimetableDTO));
+        assertThrows(IllegalArgumentException.class, () -> timetableService.updateTimetable(timetableDTO.getStartDateTime().toLocalDate(), updatedTimetableDTO));
     }
 
 }
