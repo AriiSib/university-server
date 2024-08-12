@@ -174,7 +174,7 @@ public class TimetableService {
 
         totalMinutes += Duration.between(newStartDateTime, newEndDateTime).toMinutes();
 
-        return totalMinutes > propertyService.getMaxClassesTime();
+        return totalMinutes > propertyService.getPropertyAsInt("max.classes", 90);
     }
 
     private boolean isDurationValid(LocalDateTime startDateTime, LocalDateTime endDateTime) {

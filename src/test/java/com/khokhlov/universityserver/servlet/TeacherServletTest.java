@@ -6,15 +6,10 @@ import com.khokhlov.universityserver.model.Teacher;
 import com.khokhlov.universityserver.model.Subject;
 import com.khokhlov.universityserver.model.dto.SubjectDTO;
 import com.khokhlov.universityserver.model.dto.TeacherDTO;
-import com.khokhlov.universityserver.service.JsonService;
-import com.khokhlov.universityserver.service.TeacherService;
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.http.HttpServletRequest;
+import com.khokhlov.universityserver.testutils.MockSetup;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -22,35 +17,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 
-import static com.khokhlov.universityserver.consts.Consts.JSON_SERVICE;
-import static com.khokhlov.universityserver.consts.Consts.TEACHER_SERVICE;
 import static com.khokhlov.universityserver.model.Subject.MATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-class TeacherServletTest {
-
-    @Mock
-    private TeacherService teacherService;
-
-    @Mock
-    private JsonService jsonService;
-
-    @Mock
-    private HttpServletRequest request;
-
-    @Mock
-    private HttpServletResponse response;
-
-    @Mock
-    private ServletConfig servletConfig;
-
-    @Mock
-    private ServletContext servletContext;
-
-    @InjectMocks
-    private TeacherServlet servlet;
+class TeacherServletTest extends MockSetup {
 
     private StringWriter responseWriter;
 
@@ -59,17 +31,13 @@ class TeacherServletTest {
     private SubjectDTO subjectDTO;
 
     @BeforeEach
-    void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
-
-        when(servletConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getAttribute(TEACHER_SERVICE)).thenReturn(teacherService);
-        when(servletContext.getAttribute(JSON_SERVICE)).thenReturn(jsonService);
+    protected void setUp() throws Exception {
+        super.setUp();
 
         responseWriter = new StringWriter();
         when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
 
-        servlet.init(servletConfig);
+        teacherServlet.init(servletConfig);
 
         teacherDTO = new TeacherDTO("John", "Doe", 1L, List.of(Subject.MATH));
         teacher = teacher = new Teacher(1L, "John", "Doe", 1L, List.of(MATH));
@@ -82,7 +50,7 @@ class TeacherServletTest {
         when(teacherService.getAllTeachers()).thenReturn(teachers);
         when(jsonService.toJson(teachers)).thenReturn("[{\"id\":1}]");
 
-        servlet.doGet(request, response);
+        teacherServlet.doGet(request, response);
 
         verify(teacherService).getAllTeachers();
         assertEquals("[{\"id\":1}]", responseWriter.toString());
@@ -97,7 +65,7 @@ class TeacherServletTest {
         when(jsonService.fromJson(teacherJson, TeacherDTO.class)).thenReturn(teacherDTO);
         doThrow(new TeacherAlreadyExistsException("Teacher already exists")).when(teacherService).addTeacher(teacherDTO);
 
-        servlet.doPost(request, response);
+        teacherServlet.doPost(request, response);
 
         assertTrue(responseWriter.toString().contains("Teacher already exists"));
         verify(response).setStatus(HttpServletResponse.SC_CONFLICT);
@@ -109,7 +77,7 @@ class TeacherServletTest {
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(teacherJson)));
         when(jsonService.fromJson(teacherJson, TeacherDTO.class)).thenReturn(teacherDTO);
 
-        servlet.doPost(request, response);
+        teacherServlet.doPost(request, response);
 
         verify(teacherService).addTeacher(teacherDTO);
         verify(response).setStatus(HttpServletResponse.SC_CREATED);
@@ -122,7 +90,7 @@ class TeacherServletTest {
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(subjectJson)));
         when(jsonService.fromJson(subjectJson, SubjectDTO.class)).thenReturn(subjectDTO);
 
-        servlet.doPut(request, response);
+        teacherServlet.doPut(request, response);
 
         verify(teacherService).addSubjectToTeacher(1L, subjectDTO);
         verify(response).setStatus(HttpServletResponse.SC_OK);
@@ -137,7 +105,7 @@ class TeacherServletTest {
         when(jsonService.fromJson(subjectJson, SubjectDTO.class)).thenReturn(subjectDTO);
         doThrow(new TeacherNotFoundException("Teacher with id 999 not found")).when(teacherService).addSubjectToTeacher(999L, subjectDTO);
 
-        servlet.doPut(request, response);
+        teacherServlet.doPut(request, response);
 
         assertTrue(responseWriter.toString().contains("Teacher with id 999 not found"));
         verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -151,7 +119,7 @@ class TeacherServletTest {
         when(jsonService.fromJson(subjectJson, SubjectDTO.class)).thenReturn(subjectDTO);
         doThrow(new RuntimeException("Failed to add subject")).when(teacherService).addSubjectToTeacher(1L, subjectDTO);
 
-        servlet.doPut(request, response);
+        teacherServlet.doPut(request, response);
 
         assertTrue(responseWriter.toString().contains("Failed to add subject"));
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);

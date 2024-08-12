@@ -41,8 +41,8 @@ class ValidatorTest {
     @Test
     void should_ThrowIllegalArgumentException_When_DurationExceedsMaxAllowed() {
         PropertyService propertyService = Mockito.mock(PropertyService.class);
-        Mockito.when(propertyService.getMaxClassesTime()).thenReturn(60);
-        Mockito.when(propertyService.getMinClassesTime()).thenReturn(30);
+        Mockito.when(propertyService.getPropertyAsInt("max.classes", 90)).thenReturn(60);
+        Mockito.when(propertyService.getPropertyAsInt("min.classes", 90)).thenReturn(30);
 
         LocalDateTime startDateTime = LocalDateTime.of(2024, 7, 21, 10, 0);
         LocalDateTime endDateTime = LocalDateTime.of(2024, 7, 21, 11, 1);
@@ -55,8 +55,8 @@ class ValidatorTest {
     @Test
     void should_ThrowIllegalArgumentException_When_DurationIsLessThanMinAllowed() {
         PropertyService propertyService = Mockito.mock(PropertyService.class);
-        Mockito.when(propertyService.getMaxClassesTime()).thenReturn(120);
-        Mockito.when(propertyService.getMinClassesTime()).thenReturn(60);
+        Mockito.when(propertyService.getPropertyAsInt("max.classes", 90)).thenReturn(120);
+        Mockito.when(propertyService.getPropertyAsInt("min.classes", 90)).thenReturn(60);
 
         LocalDateTime startDateTime = LocalDateTime.of(2024, 7, 21, 10, 0);
         LocalDateTime endDateTime = LocalDateTime.of(2024, 7, 21, 10, 59);
@@ -69,8 +69,8 @@ class ValidatorTest {
     @Test
     void should_NotThrowException_When_TimetableDurationIsValid() {
         PropertyService propertyService = Mockito.mock(PropertyService.class);
-        Mockito.when(propertyService.getMaxClassesTime()).thenReturn(120);
-        Mockito.when(propertyService.getMinClassesTime()).thenReturn(60);
+        Mockito.when(propertyService.getPropertyAsInt("max.classes", 90)).thenReturn(120);
+        Mockito.when(propertyService.getPropertyAsInt("min.classes", 90)).thenReturn(60);
 
         LocalDateTime startDateTime = LocalDateTime.of(2024, 7, 21, 10, 0);
         LocalDateTime endDateTime = LocalDateTime.of(2024, 7, 21, 11, 0);

@@ -35,19 +35,11 @@ public class PropertyService {
         }
     }
 
-    public int getMinClassesTime() {
-        return Integer.parseInt(properties.getProperty("min.classes")) * 90;
+    public int getPropertyAsInt(String propertyName) {
+        return Integer.parseInt(properties.getProperty(propertyName));
     }
 
-    public int getMaxClassesTime() {
-        return Integer.parseInt(properties.getProperty("max.classes")) * 90;
-    }
-
-    public int getMinStudents() {
-        return Integer.parseInt(properties.getProperty("min.students"));
-    }
-
-    public int getMaxStudents() {
-        return Integer.parseInt(properties.getProperty("max.students"));
+    public int getPropertyAsInt(String propertyName, int classPeriodInMinutes) {
+        return getPropertyAsInt(propertyName) * classPeriodInMinutes;
     }
 }

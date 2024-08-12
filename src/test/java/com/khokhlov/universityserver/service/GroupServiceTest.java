@@ -123,7 +123,7 @@ class GroupServiceTest {
 
     @Test
     void should_ThrowException_When_AddingTooManyStudents() {
-        int maxStudents = propertyService.getMaxStudents();
+        int maxStudents = propertyService.getPropertyAsInt("max.students");
 
         List<Student> initialStudents = new ArrayList<>();
         for (long i = 1; i <= maxStudents; i++) {
@@ -139,7 +139,7 @@ class GroupServiceTest {
 
     @Test
     void should_ThrowException_When_NotEnoughStudentsInGroup() {
-        int minStudents = propertyService.getMinStudents();
+        int minStudents = propertyService.getPropertyAsInt("min.students");
         int[] studentIds = new int[minStudents - 1]; // меньше минимального числа студентов
         for (int i = 0; i < studentIds.length; i++) {
             studentIds[i] = i + 1;
@@ -152,7 +152,7 @@ class GroupServiceTest {
 
     @Test
     void should_ThrowException_When_TooManyStudentsInGroup() {
-        int maxStudents = propertyService.getMaxStudents();
+        int maxStudents = propertyService.getPropertyAsInt("max.students");
         int[] studentIds = new int[maxStudents + 1]; // больше максимального числа студентов
         for (int i = 0; i < studentIds.length; i++) {
             studentIds[i] = i + 1;

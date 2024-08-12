@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.khokhlov.universityserver.exception.InvalidJsonException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -14,8 +13,6 @@ public class JsonService {
 
     private final ObjectMapper objectMapper;
 
-
-    @SneakyThrows
     public String toJson(Object obj) {
         try {
             String json = objectMapper.writeValueAsString(obj);
@@ -27,7 +24,6 @@ public class JsonService {
         }
     }
 
-    @SneakyThrows
     public <T> T fromJson(String json, Class<T> clazz) {
         try {
             T obj = objectMapper.readValue(json, clazz);

@@ -59,8 +59,8 @@ public class GroupService {
     public List<Student> getStudentsById(GroupDTO groupDTO) {
         List<Student> students = new ArrayList<>();
 
-        int minStudents = propertyService.getMinStudents();
-        int maxStudents = propertyService.getMaxStudents();
+        int minStudents = propertyService.getPropertyAsInt("min.students");
+        int maxStudents = propertyService.getPropertyAsInt("max.students");
         int studentCount = groupDTO.getStudents().length;
 
         if (studentCount < minStudents) {
@@ -116,7 +116,7 @@ public class GroupService {
                 });
 
         List<Student> currentStudents = group.getStudents();
-        int maxStudents = propertyService.getMaxStudents();
+        int maxStudents = propertyService.getPropertyAsInt("max.students");
 
         if (currentStudents.size() + studentsToAdd.size() > maxStudents) {
             log.error("Adding students will exceed the maximum number of {} students.", maxStudents);

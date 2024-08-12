@@ -5,11 +5,7 @@ import com.khokhlov.universityserver.exception.GroupNotFoundException;
 import com.khokhlov.universityserver.model.Group;
 import com.khokhlov.universityserver.model.Student;
 import com.khokhlov.universityserver.model.dto.GroupDTO;
-import com.khokhlov.universityserver.service.GroupService;
-import com.khokhlov.universityserver.service.JsonService;
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.http.HttpServletRequest;
+import com.khokhlov.universityserver.testutils.MockSetup;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,28 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-class GroupServletTest {
-
-    @Mock
-    private GroupService groupService;
-
-    @Mock
-    private JsonService jsonService;
-
-    @Mock
-    private HttpServletRequest request;
-
-    @Mock
-    private HttpServletResponse response;
-
-    @Mock
-    private ServletConfig servletConfig;
-
-    @Mock
-    private ServletContext servletContext;
-
-    @InjectMocks
-    private GroupServlet servlet;
+class GroupServletTest extends MockSetup {
 
     private StringWriter responseWriter;
 
@@ -56,17 +31,13 @@ class GroupServletTest {
     private Student student;
 
     @BeforeEach
-    void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
-
-        when(servletConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getAttribute(GROUP_SERVICE)).thenReturn(groupService);
-        when(servletContext.getAttribute(JSON_SERVICE)).thenReturn(jsonService);
+    protected void setUp() throws Exception {
+        super.setUp();
 
         responseWriter = new StringWriter();
         when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
 
-        servlet.init(servletConfig);
+        servletGroup.init(servletConfig);
 
         student = new Student(1L, "John", "Doe", null, null);
         group = new Group(1L, 1, List.of(student));
@@ -78,7 +49,7 @@ class GroupServletTest {
         when(groupService.getAllGroups()).thenReturn(groups);
         when(jsonService.toJson(groups)).thenReturn("[{\"id\":1}]");
 
-        servlet.doGet(request, response);
+        servletGroup.doGet(request, response);
 
         verify(groupService).getAllGroups();
         assertEquals("[{\"id\":1}]", responseWriter.toString());
@@ -91,7 +62,7 @@ class GroupServletTest {
         when(groupService.getGroupByNumber("1")).thenReturn(Optional.of(group));
         when(jsonService.toJson(Optional.of(group))).thenReturn("{\"id\":1}");
 
-        servlet.doGet(request, response);
+        servletGroup.doGet(request, response);
 
         verify(groupService).getGroupByNumber("1");
         assertEquals("{\"id\":1}", responseWriter.toString());
@@ -104,7 +75,7 @@ class GroupServletTest {
         when(groupService.getGroupBySurname("Doe")).thenReturn(Optional.of(group));
         when(jsonService.toJson(Optional.of(group))).thenReturn("{\"id\":1}");
 
-        servlet.doGet(request, response);
+        servletGroup.doGet(request, response);
 
         verify(groupService).getGroupBySurname("Doe");
         assertEquals("{\"id\":1}", responseWriter.toString());
@@ -116,7 +87,7 @@ class GroupServletTest {
         when(request.getParameter("number")).thenReturn("999");
         when(groupService.getGroupByNumber("999")).thenThrow(new GroupNotFoundException("Group not found"));
 
-        servlet.doGet(request, response);
+        servletGroup.doGet(request, response);
 
         verify(groupService).getGroupByNumber("999");
         assertTrue(responseWriter.toString().contains("Group not found"));
@@ -128,7 +99,7 @@ class GroupServletTest {
         when(request.getParameter(SURNAME)).thenReturn("Nonexistent");
         when(groupService.getGroupBySurname("Nonexistent")).thenThrow(new GroupNotFoundException("Group not found"));
 
-        servlet.doGet(request, response);
+        servletGroup.doGet(request, response);
 
         verify(groupService).getGroupBySurname("Nonexistent");
         assertTrue(responseWriter.toString().contains("Group not found"));
@@ -139,7 +110,7 @@ class GroupServletTest {
     void should_ReturnBadRequest_When_InvalidGroupNumberFormat() throws Exception {
         when(request.getPathInfo()).thenReturn("/invalid");
 
-        servlet.doPut(request, response);
+        servletGroup.doPut(request, response);
 
         assertTrue(responseWriter.toString().contains("Invalid group number format"));
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -154,7 +125,7 @@ class GroupServletTest {
         when(groupService.getStudentsById(groupDTO)).thenReturn(List.of(student));
         doThrow(new GroupAlreadyExistsException("Group already exists")).when(groupService).addGroup(groupDTO);
 
-        servlet.doPost(request, response);
+        servletGroup.doPost(request, response);
 
         assertTrue(responseWriter.toString().contains("Group already exists"));
         verify(response).setStatus(HttpServletResponse.SC_CONFLICT);
@@ -168,7 +139,7 @@ class GroupServletTest {
         when(jsonService.fromJson(groupJson, GroupDTO.class)).thenReturn(groupDTO);
         when(groupService.getStudentsById(groupDTO)).thenReturn(List.of(student));
 
-        servlet.doPost(request, response);
+        servletGroup.doPost(request, response);
 
         verify(groupService).addGroup(groupDTO);
         verify(response).setStatus(HttpServletResponse.SC_CREATED);
@@ -192,7 +163,7 @@ class GroupServletTest {
         when(groupService.addStudentsToGroup(Long.parseLong(groupNumber), List.of(student1, student2, student3)))
                 .thenReturn(success);
 
-        servlet.doPut(request, response);
+        servletGroup.doPut(request, response);
 
         verify(groupService).addStudentsToGroup(Long.parseLong(groupNumber), List.of(student1, student2, student3));
         verify(response).setStatus(HttpServletResponse.SC_OK);
@@ -215,7 +186,7 @@ class GroupServletTest {
         when(groupService.addStudentsToGroup(Long.parseLong(groupNumber), List.of(student1, student2, student3)))
                 .thenThrow(new GroupNotFoundException("Group not found"));
 
-        servlet.doPut(request, response);
+        servletGroup.doPut(request, response);
 
         assertTrue(responseWriter.toString().contains("Group not found"));
         verify(response).setStatus(HttpServletResponse.SC_CONFLICT);

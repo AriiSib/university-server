@@ -56,7 +56,7 @@ class TimetableServiceTest {
 
         when(mappingService.fromTimetableDTO(anyLong(), eq(timetableDTO))).thenReturn(timetable);
         when(mappingService.fromTimetableDTO(timetableDTO)).thenReturn(timetable);
-        when(propertyService.getMaxClassesTime()).thenReturn(450);
+        when(propertyService.getPropertyAsInt("max.classes", 90)).thenReturn(450);
     }
 
     @Test
