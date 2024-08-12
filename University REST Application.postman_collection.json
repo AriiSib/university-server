@@ -1,0 +1,952 @@
+{
+	"info": {
+		"_postman_id": "fc36830f-0e1a-4336-aafa-d22ed0b37080",
+		"name": "University REST Application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35343974",
+		"_collection_link": "https://www.postman.com/aviation-geoscientist-93303680/workspace/university-server/collection/35343974-fc36830f-0e1a-4336-aafa-d22ed0b37080?action=share&source=collection_link&creator=35343974"
+	},
+	"item": [
+		{
+			"name": "students",
+			"item": [
+				{
+					"name": "add student_1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\r\n    \"name\" : \"Arii\",\r\n    \"surname\" : \"Khokhlov\",\r\n    \"birthdate\" : \"1998-03-16\",\r\n    \"phoneNumber\" : \"+7 (123) 456-78-90\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/students",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add student_2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\r\n    \"name\" : \"Anton\",\r\n    \"surname\" : \"Kupreychik\",\r\n    \"birthdate\" : \"2000-06-16\",\r\n    \"phoneNumber\" : \"+375 (29) 123-45-67\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/students",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add student_3",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\r\n    \"name\" : \"John\",\r\n    \"surname\" : \"Doe\",\r\n    \"birthdate\" : \"1988-01-01\",\r\n    \"phoneNumber\" : \"+375 (29) 321-45-76\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/students",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add student_4",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\r\n    \"name\" : \"Mari\",\r\n    \"surname\" : \"Yong\",\r\n    \"birthdate\" : \"1995-11-11\",\r\n    \"phoneNumber\" : \"+375 (15) 852-21-47\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/students",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all students",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/students",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get student by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/students/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get student by name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/students?name=arii",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "arii"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get student by surname",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/students?surname=khokhlov",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students"
+							],
+							"query": [
+								{
+									"key": "surname",
+									"value": "khokhlov"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get student by name & surname",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/students?name=Arii&surname=khokhlov",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Arii"
+								},
+								{
+									"key": "surname",
+									"value": "khokhlov"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit student",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\r\n    \"name\": \"Antonio\",\r\n    \"surname\": \"Kupreychio\",\r\n    \"birthdate\":\"2024-07-23\",\r\n    \"phoneNumber\": \"+375 (29) 123-45-67\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/students/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete student",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/students/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"students",
+								"4"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "teachers",
+			"item": [
+				{
+					"name": "add teacher_1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n      \"name\":\"Ivan\",\r\n      \"surname\" : \"Ivanov\",\r\n      \"experience\": 1,\r\n      \"subjects\": [\"Math\", \"Economics\"]\r\n   }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/teachers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"teachers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add subject",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"subject\" : \"Chemistry\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/teachers/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"teachers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add teacher_2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n      \"name\":\"Petr\",\r\n      \"surname\" : \"Petrov\",\r\n      \"experience\": 2,\r\n      \"subjects\": [\"Math\", \"Programming\"]\r\n   }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/teachers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"teachers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all teachers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/teachers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"teachers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "groups",
+			"item": [
+				{
+					"name": "create group",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\":\"123123212\",\r\n    \"students\" : [1, 2]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/groups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add students to group",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"students\" : [3]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/groups/123123212",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"groups",
+								"123123212"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create group(fail. Students > property.config)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\":\"1234567890\",\r\n    \"students\" : [1, 2, 3, 4]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/groups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/groups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get group by number",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/groups?number=123123212",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"groups"
+							],
+							"query": [
+								{
+									"key": "number",
+									"value": "123123212"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get group by surname",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/groups?surname=khokhlov",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"groups"
+							],
+							"query": [
+								{
+									"key": "surname",
+									"value": "khokhlov"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get group by number & surname",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/groups?number=123123212&surname=khokhlov",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"groups"
+							],
+							"query": [
+								{
+									"key": "number",
+									"value": "123123212"
+								},
+								{
+									"key": "surname",
+									"value": "khokhlov"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "timetable",
+			"item": [
+				{
+					"name": "create timetable_1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"groupId\" : 1,\r\n\t\"teacherId\" : 1,\r\n\t\"startDateTime\" : \"2024-05-13 12:00\",\r\n    \"endDateTime\" : \"2024-05-13 13:30\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create timetable_2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"groupId\" : 1,\r\n\t\"teacherId\" : 1,\r\n\t\"startDateTime\" : \"2024-05-13 13:30\",\r\n    \"endDateTime\" : \"2024-05-13 15:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create timetable_3",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"groupId\" : 1,\r\n\t\"teacherId\" : 1,\r\n\t\"startDateTime\" : \"2024-05-13 15:00\",\r\n    \"endDateTime\" : \"2024-05-13 16:30\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create timetable_4",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"groupId\" : 1,\r\n\t\"teacherId\" : 1,\r\n\t\"startDateTime\" : \"2024-05-13 16:30\",\r\n    \"endDateTime\" : \"2024-05-13 18:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create timetable_5",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"groupId\" : 1,\r\n\t\"teacherId\" : 1,\r\n\t\"startDateTime\" : \"2024-05-13 18:00\",\r\n    \"endDateTime\" : \"2024-05-13 19:30\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create timetable_6 (fail. total time > 5 classes)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"groupId\" : 1,\r\n\t\"teacherId\" : 1,\r\n\t\"startDateTime\" : \"2024-05-13 19:30\",\r\n    \"endDateTime\" : \"2024-05-13 21:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all timetable",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get timetable by groupNumber",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable?groupNumber=123123212",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							],
+							"query": [
+								{
+									"key": "groupNumber",
+									"value": "123123212"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get timetable by student surname",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable?studentSurname=Khokhlov",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							],
+							"query": [
+								{
+									"key": "studentSurname",
+									"value": "Khokhlov"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get timetable by teacher surname",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable?teacherSurname=Ivanov",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							],
+							"query": [
+								{
+									"key": "teacherSurname",
+									"value": "Ivanov"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get timetable by date",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable?date=13/05/2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "13/05/2024"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update timetable",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"groupId\" : 1,\r\n\t\"teacherId\" : 1,\r\n\t\"startDateTime\" : \"2024-05-14 12:00\",\r\n    \"endDateTime\" : \"2024-05-14 13:30\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/university-server/timetable?date=13/05/2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"university-server",
+								"timetable"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "13/05/2024"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
